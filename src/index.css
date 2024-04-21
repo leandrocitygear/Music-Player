@@ -14,32 +14,85 @@
   box-sizing: border-box;
 }
 
-html, body {
-  font-family: discBlack, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+html, #body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif;
   width: 100%;
   height: 100%;
-  /* border: solid; */
+  border: solid lawngreen 1px;
+  overflow: hidden;
+  /* background-image: url(./04.jpg); */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url(./08.jpg);
+  display: flex;
+  justify-content: center;
 }
 
-header {
-  border: solid blue;
-  display: flex;
+.topNav {
+  position: absolute;
+  right: 180px;
+  border: solid;
+  margin-top: 10px;
 }
 
 ul {
   list-style: none;
-  position: absolute;
-  right: 80px;
-  margin-top: 10px;
 }
 
 .logo {
-  border: solid red;
+  /* border: solid red; */
   font-family: disc, sans-serif;
   font-size: 60px;
+  /* width: 234px; */
+  width: 100%;
+  padding-left: 10px;
+  position:absolute;
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
 }
 
-main {
-  border: solid green;
+.albumArt {
+  height: 160px;
+  width: 160px;
+  position: absolute;
+  bottom: 130px;
+  left: 100px;
+  border: solid white 7px;
+}
+
+.artName {
+  position: absolute;
+  bottom: 250px;
+  left: 280px;
+  color: white;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.albumName {
+  position: absolute;
+  bottom: 220px;
+  left: 280px;
+  color: white;
+  font-size: 25px;
+}
+
+.songName {
+  position: absolute;
+  bottom: 170px;
+  left: 280px;
+  color: white;
+  font-size: 25px;
+}
+
+.musicControls {
+  border: solid;
+  position: absolute;
+  bottom: 30px;
+}
+
+audio {
+  /* position: absolute; */
+  /* bottom: 30px; */
 }

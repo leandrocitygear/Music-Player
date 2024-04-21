@@ -9,8 +9,13 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 800,
+    width: 1012,
+    height: 690,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: 'rgba(0, 0, 0, 0)',
+      symbolColor: '#74b1be',
+    },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
