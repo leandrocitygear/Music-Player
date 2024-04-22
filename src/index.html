@@ -5,23 +5,43 @@
     <title>disc=out</title>
     <link rel="stylesheet" href="index.css" />
     <script src="./render.js"></script>
-
   </head>
   <body id="body">
+    <div class="background">
+      <div class="dark-overlay"></div>
+    </div>
       <h1 class="logo">disc=out</h1>
-      <Nav class="topNav">
-        <ul>
-          <li>Settings</li>
-        </ul>
-      </Nav>
       <img class="albumArt" src="./Parachutes.png" alt="">
       <p class="artName">COLDPLAY</p>
       <p class="albumName">PARACHUTES</p>
       <p class="songName">Shiver</p>
-      <div class="musicControls">
-        <audio controls src="./02 - Shiver.m4a"></audio>
+      <div class="musicProgres">
+        <audio id="myAudio">
+          <source id="sourceAudio" src="" type="audio"/>
+        </audio>
+
+        <div class="player">
+        <div class="timer">00:00</div>
+        <div class="title">Shiver</div>
+        <div class="duration">00:00</div>
+        <div id="myProgress">
+          <div id="myBar"></div>
+        </div>
       </div>
-      
+    </div>
+    <div class="musicControls">
+    <img class="icons" src="./icons/menu.png" alt="">
+    <img class="icons" src="./icons/repeat.png" alt="">
+    <img class="icons" src="./icons/shuffle.png" alt="">
+    <img class="icons" src="./icons/skip_previous.png" alt="">
+    <img class="icons" src="./icons/play.png" alt="">
+    <img class="icons" src="./icons/skip_next.png" alt="">
+    <img class="icons" src="./icons/fullscreen.png" alt="">
+    <img class="icons" src="./icons/outline_volume_up_white_18dp.png" alt="">
+  </div>
+  <div id="settings" class="icon">
+    <img src="./icons/settings.png" alt="">
+  </div>
 
   </body>
 </html>
