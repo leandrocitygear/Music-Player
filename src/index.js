@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('node:path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -18,6 +18,8 @@ const createWindow = () => {
     },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
     },
   });
 
@@ -29,7 +31,7 @@ const createWindow = () => {
 };
 
 // This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
+// initialization and is ready to create browser window.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow();
@@ -39,6 +41,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
+
     }
   });
 });
@@ -53,4 +56,30 @@ app.on('window-all-closed', () => {
 });
 
 // In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
+// code. You can also put them in separate files and imrt t .
+
+let settingsWindow;
+
+function createSettingsWindow() {
+  settingsWindow = new BrowserWindow({
+    width: 500,
+    height: 500,
+    title: 'Settings',
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: 'rgba(0, 0, 0, 0)',
+      symbolColor: '#fff',
+    },
+    
+  });
+
+  settingsWindow.loadFile(path.join(__dirname, 'settings.html'));
+}
+
+    ipcMain.on('settings', () => {
+      if (!settingsWindow || settingsWindow.isDestroyed()) {
+        createSettingsWindow();
+      } else {
+        settingsWindow.focus();
+      }
+    });

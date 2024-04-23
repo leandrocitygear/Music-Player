@@ -1,0 +1,45 @@
+@font-face {
+    font-family:'disc';
+    src: url('font/disc.TTF') format('truetype');
+  }
+  
+  @font-face {
+    font-family:'discBlack';
+    src: url('font/disc_black.TTF') format('truetype');
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+      Arial, sans-serif;
+    width: 100%;
+    height: 100%;
+    /* border: solid white 1px; */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+  }
+
+.background {
+    background-image: url(./brandi-redd-aJTiW00qqtI-unsplash.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position:center;
+  height: 100%;
+  width: 100%;
+} 
+
+.dark-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2); /* Adjust the alpha value(0.5) t control darkness */
+    border: solid white 1px;
+  }

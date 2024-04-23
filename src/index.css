@@ -27,7 +27,6 @@ html, #body {
 
 .background {
   background-image: url(./331295.jpg);
-  /* background-image: url(./04.jpg); */
   background-repeat: no-repeat;
   background-size: cover;
   background-position:center;
@@ -88,7 +87,8 @@ button:hover {
   position:absolute;
   z-index: 0;
   -webkit-app-region: drag;
-  -webkit-user-select: none;
+  -webkit-user-select:none;
+
   color: white;
 }
 
