@@ -3,10 +3,6 @@
   src: url('font/disc.TTF') format('truetype');
 }
 
-@font-face {
-  font-family:'discBlack';
-  src: url('font/disc_black.TTF') format('truetype');
-}
 
 * {
   margin: 0;
@@ -181,7 +177,7 @@ bottom: 25px;
 
 #settings {
   position: absolute;
-  border: solid 1px transparent ;
+  border: solid 1px transparent;
 
   bottom: 2px;
   right: 2px;
