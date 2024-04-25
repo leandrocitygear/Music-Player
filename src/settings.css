@@ -46,7 +46,7 @@
     top: 0;
     position: absolute;
     -webkit-app-region: drag;
-  -webkit-user-select:none;
+   -webkit-user-select: none;
   }
 
   h1 {

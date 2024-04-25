@@ -10,10 +10,16 @@
       <div class="dark-overlay"></div>
     </div>
     <h1 class="logo">disc=out</h1>
+    <div class="nowPlaying">
       <img class="albumArt" src="./Parachutes.png" alt="">
       <p class="artName">COLDPLAY</p>
       <p class="albumName">PARACHUTES</p>
       <p class="songName">Shiver</p>
+      <div title="I like" id="likeButton">
+        <img src="./icons/favorite.png"/>
+      </div>
+    </div>
+
       <div class="musicProgres">
         <audio id="myAudio">
           <source id="sourceAudio" src="" type="audio"/>
@@ -29,17 +35,63 @@
       </div>
     </div>
     <div class="musicControls">
-    <img class="icons" src="./icons/menu.png" alt="">
-    <img class="icons" src="./icons/repeat.png" alt="">
-    <img class="icons" src="./icons/shuffle.png" alt="">
-    <img class="icons" src="./icons/skip_previous.png" alt="">
-    <img class="icons" src="./icons/play.png" alt="">
-    <img class="icons" src="./icons/skip_next.png" alt="">
-    <img class="icons" src="./icons/fullscreen.png" alt="">
-    <img class="icons" src="./icons/volume.png" alt="">
+      <div title="Menu" id="menu" class="icons">
+    <img  src="./icons/menu.png" alt="">
   </div>
-  <div id="settings" class="icon">
+
+  <div id="repeat" title="Repeat" class="icons">
+    <img  src="./icons/repeat.png" alt="">
+  </div>
+
+    <div id="shuffle" title="Shuffle" class="icons">
+    <img  src="./icons/shuffle.png" alt="">
+  </div>
+
+  <div id="skip_previous" title="Provious" class="icons">
+    <img  src="./icons/skip_previous.png" alt="">
+  </div>
+
+  <div id="play" title="Play" class="icons">
+    <img  src="./icons/play.png" alt="">
+  </div>
+
+  <div id="skip_next" title="Next" class="icons">
+    <img  src="./icons/skip_next.png" alt="">
+  </div>
+
+  <div id="fullscreen" title="Fullscreen" class="icons">
+    <img  src="./icons/fullscreen.png" alt="">
+  </div>
+
+  <div id="volume" class="icons">
+    <img src="./icons/volume.png" alt="">
+  </div>
+  </div>
+
+  <div id="settings">
     <img src="./icons/settings.png" alt="">
+  </div>
+
+  <div class="navigation">
+    <div class="background2">
+      <div class="dark-overlay2"></div>
+    </div>
+    <input id="search"/>
+    <div id="searchButton" class="icons">
+      <img src="./icons/search.png" alt="">
+    </div>
+   <div class="tabs">
+    <div class="musicTabs" id="albums">ALBUMS</div>
+    <div class="musicTabs" id="artists">ARTISTS</div>
+    <div class="musicTabs" id="songs">SONGS</div>
+    <div class="musicTabs" id="genres">GENRES</div>
+    <div class="musicTabs" id="playlist">PLAYLIST</div>
+  </div> 
+  <div id="results">
+    
+
+  </div>
+
   </div>
   
   <script src="./render.js"></script>
