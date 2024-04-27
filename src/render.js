@@ -5,3 +5,7 @@ document.getElementById('settings').addEventListener('click', () => {
     console.log('Settings clicked');
   ipcRenderer.send('settings');
 });
+
+document.getElementById('menu').addEventListener('click', () => {
+
+});
