@@ -231,6 +231,7 @@ bottom: 25px;
   height: 70%;
   width: 50%;
   overflow: hidden;
+  display: none;
 }
 
 #search {
