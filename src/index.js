@@ -1,4 +1,5 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { error } = require('node:console');
 const path = require('node:path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -27,7 +28,30 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+
+  ipcMain.on('open-file-dialog', (event) => {
+    dialog.showOpenDialog({
+
+      filter: [
+        {
+          name: 'Music files',
+          extensions: ['mp3', 'wav', 'aac', 'm4a', 'flac', 'wma']
+        }
+      ],
+      properties: ['openFile', 'multiSelections']
+    }).then(result => {
+      if (!result.canceled) {
+        event.sender.send('selected-files', result.filePaths);
+      }
+    }).catch(err => {
+      console.error(err);
+    });
+  });
+  
+
+
+ 
 };
 
 // This method will be called when Electron has finished
@@ -58,28 +82,5 @@ app.on('window-all-closed', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and imrt t .
 
-let settingsWindow;
 
-function createSettingsWindow() {
-  settingsWindow = new BrowserWindow({
-    width: 500,
-    height: 500,
-    title: 'Settings',
-    titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: 'rgba(0, 0, 0, 0)',
-      symbolColor: '#fff',
-    },
     
-  });
-
-  settingsWindow.loadFile(path.join(__dirname, 'settings.html'));
-}
-
-    ipcMain.on('settings', () => {
-      if (!settingsWindow || settingsWindow.isDestroyed()) {
-        createSettingsWindow();
-      } else {
-        settingsWindow.focus();
-      }
-    });
