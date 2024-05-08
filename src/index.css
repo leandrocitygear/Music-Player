@@ -21,10 +21,10 @@ html, #body {
   justify-content: center;
 }
 
-.background {
-  background-image: url(./331295.jpg);
-  background-repeat: no-repeat;
-  background-size: cover;
+#background {
+  background-image: url('./b.jpg');
+  background-repeat:repeat;
+  background-size: contain;
   background-position:center;
   height: 100%;
   width: 100%;
@@ -93,7 +93,7 @@ button:hover {
   position: absolute;
   bottom: 130px;
   left: 100px;
-  width: 400px;
+  width: 94%;
   height: 165px;
   
 }
@@ -114,6 +114,8 @@ button:hover {
   color: white;
   font-size: 27px;
   font-weight: 700;
+  width: 89%;
+
 }
 
 .albumName {
@@ -122,14 +124,18 @@ button:hover {
   left: 180px;
   color: white;
   font-size: 25px;
+  width: 89%;
+
 }
 
 .songName {
   position: absolute;
   bottom: 40px;
   left: 180px;
+  width: 89%;
   color: white;
   font-size: 25px;
+  /* border: solid; */
 }
 
 #likeButton {
@@ -222,6 +228,20 @@ bottom: 25px;
   transform: scale(0.9);
 }
 
+#addBackground {
+  position: absolute;
+  border: solid 1px transparent;
+  bottom: 2px;
+  right: 26px;
+  height: 20px;
+  width: 20px;
+}
+
+#addBackground:hover {
+  border: solid 1px white;
+  
+}
+
 #navigation {
   position: absolute;
   bottom: 100px;
@@ -309,6 +329,11 @@ bottom: 25px;
   height: 82%;
   /* display: none; */
   overflow-y: scroll;
+  display:flex;
+  flex-wrap: wrap;
+  left: 5%;
+  
+  
   /* padding: 20px; */
   /* padding-bottom: 20px; */
   /* padding-left: %; */
@@ -320,10 +345,37 @@ bottom: 25px;
   display: none;
 }
 
-.art {
-  width: 25%;
+#art {
+  width: 75%;
   /* height: 25%; */
-  margin-left: 6%;
-  margin-bottom: 6%;
+  /* margin-left: 15%; */
+  /* margin-bottom: 15%; */
   /* border: solid white 5px; */
 }
+
+#title {
+  font-size: 12px;
+  color: white;
+  
+
+}
+
+
+#artistsName {
+  font-size: 12px;
+  color: white;
+}
+
+#alb {
+  font-size: 12px;
+  color: white;
+}
+
+
+.songContainer {
+ /* border: solid white; */
+ width: 30%;
+ text-align: center;
+ height: 60%;
+}
+

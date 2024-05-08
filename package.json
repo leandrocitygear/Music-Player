@@ -29,6 +29,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "jsmediatags": "^1.1.0",
+    "music-metadata": "^7.14.0",
+    "uuid": "^9.0.1"
   }
 }
