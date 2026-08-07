@@ -36,7 +36,7 @@ html, #body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.2); /* Adjust the alpha value (0.5) to control darkness */
+  background-color: rgba(0, 0, 0, 0.3); /* Adjust the alpha value (0.5) to control darkness */
   border: solid white 1px;
 }
 
@@ -93,9 +93,10 @@ button:hover {
   position: absolute;
   bottom: 130px;
   left: 100px;
-  width: 94%;
+  width: 165px;
   height: 165px;
-  
+  overflow: visible;
+
 }
 
 .albumArt {
@@ -104,7 +105,8 @@ button:hover {
   position: absolute;
   bottom: 0;
   left: 0px;
-  border: solid white 5px;
+  border: solid white 1px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
 }
 
 .artName {
@@ -114,7 +116,10 @@ button:hover {
   color: white;
   font-size: 27px;
   font-weight: 700;
-  width: 89%;
+    /* width: fit-content; */
+    white-space: nowrap;
+    
+
 
 }
 
@@ -124,7 +129,9 @@ button:hover {
   left: 180px;
   color: white;
   font-size: 25px;
-  width: 89%;
+  /* width: fit-content; */
+    white-space: nowrap;
+
 
 }
 
@@ -132,9 +139,11 @@ button:hover {
   position: absolute;
   bottom: 40px;
   left: 180px;
-  width: 89%;
+    /* width: fit-content; */
   color: white;
   font-size: 25px;
+   white-space: nowrap;
+
   /* border: solid; */
 }
 
@@ -250,8 +259,10 @@ bottom: 25px;
   /* height: 500px; */
   height: 70%;
   width: 50%;
-  overflow: hidden;
+  /* overflow: visible; */
   display: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
 }
 
 #search {
@@ -280,14 +291,7 @@ bottom: 25px;
   transform: scale(0.9);
 }
 
-.background2 {
-  /* background-image: url(./1.jpg); */
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position:center;
-  height: 100%;
-  width: 100%;
-}
+
 
 .dark-overlay2 {
   position: absolute;
@@ -322,16 +326,17 @@ bottom: 25px;
 }
 
 #results {
-  /* border: solid 1px ;  */
+  /* border: solid red 2px ;  */
   position: absolute;
   top: 100px;
-  width: 100% ;
-  height: 82%;
+  bottom: 0;
+  /* width: fit-content ; */
+  /* height: 86%; */
   /* display: none; */
   overflow-y: scroll;
   display:flex;
   flex-wrap: wrap;
-  left: 5%;
+  /* left: 5%; */
   
   
   /* padding: 20px; */
@@ -345,12 +350,22 @@ bottom: 25px;
   display: none;
 }
 
+.musicbox {
+  border: solid white 1px;
+ /* width: 30%; */
+ /* text-align: center; */
+ /* height: 60%; */
+}
+
 #art {
-  width: 75%;
+  /* width: 75%; */
+  width: 160px;
+  height: 160px;
   /* height: 25%; */
   /* margin-left: 15%; */
   /* margin-bottom: 15%; */
-  /* border: solid white 5px; */
+  border: solid white 1px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 #title {
@@ -371,11 +386,44 @@ bottom: 25px;
   color: white;
 }
 
+#queue {
+  position: absolute;
+  bottom: 315px;
+  left: 50px;
+  border: solid white 1px;
+  height: 40%;
+  /* width: 25%; */
+  width: 255px;
+  /* overflow: hidden; */
+  /* display: none; */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  padding: 2px;
+  display: none;
+}
 
-.songContainer {
- /* border: solid white; */
- width: 30%;
- text-align: center;
- height: 60%;
+#queueOverlay {
+   position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#queueSong {
+  border: solid 1px white;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+
+#queueArt {
+  height: 60px;
+}
+
+#queueSongInfo {
+  color: white;
 }
 

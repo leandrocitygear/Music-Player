@@ -15,10 +15,23 @@
       <p class="artName"></p>
       <p class="albumName"></p>
       <p class="songName"></p>
-      <div title="I like" id="likeButton">
+      <div title="Favorite" id="likeButton">
         <img src="./icons/favorite.png"/>
       </div>
     </div>
+
+    <div id="queue">
+      <div id="queueOverlay"></div>
+      <div id="queueSong">
+        <img id="queueArt" src="./Parachutes.png" />
+        <div id="queueSongInfo">
+          <p id="queueSongTitle">Shiver</p>
+          <p id="queueAlb">Parachutes</p>
+          <p id="queueArtistsName">Coldplay</p>
+     </div>
+</div>
+    </div>
+
 
       <div class="musicProgres">
         <audio id="myAudio">
@@ -74,9 +87,9 @@
   
 
   <div id="navigation">
-    <div class="background2">
+    
       <div class="dark-overlay2"></div>
-    </div>
+    
     <input id="search"/>
     <div id="searchButton" class="icons">
       <img src="./icons/search.png" alt="">
@@ -88,12 +101,13 @@
     <div class="musicTabs" id="genres">GENRES</div>
     <div class="musicTabs" id="playlist">PLAYLIST</div>
   </div> 
+
   <div id="results">
     <div class="musicbox">
      <img id="art" src="" />
      <p id="title"></p>
-     <p id="artistsName"></p>
      <p id="alb"></p>
+     <p id="artistsName"></p>
 </div>
   </div>
   

@@ -16,6 +16,15 @@ if (nav.style.display === "block") {
 }
 });
 
+document.querySelector('.nowPlaying').addEventListener('click', () => {
+  const queue = document.getElementById('queue');
+  if (queue.style.display === 'block') {
+    queue.style.display = 'none';
+  } else {
+    queue.style.display = 'block';
+  }
+});
+
 
 let allFilePaths = [];
 let currentlyPlayingAudio = null;
@@ -64,7 +73,7 @@ function updateResults(filePaths) {
   // Loop through all file paths and add them to the results
   allFilePaths.forEach(filePath => {
     const songContainer = document.createElement('div');
-    songContainer.className = 'songContainer';
+    songContainer.className = 'musicbox';
      const img = document.createElement('img');
     img.id = 'art';
     // img.src = ''; // Set the source of the image here, for example: img.src = 'path/to/image.jpg';

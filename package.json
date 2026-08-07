@@ -5,7 +5,7 @@
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "electronmon .",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -20,7 +20,8 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
     "@electron-forge/plugin-fuses": "^7.4.0",
     "@electron/fuses": "^1.8.0",
-    "electron": "30.0.0"
+    "electron": "^41.2.0",
+    "electronmon": "^2.0.4"
   },
   "keywords": [],
   "author": {
@@ -31,7 +32,7 @@
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
     "jsmediatags": "^1.1.0",
-    "music-metadata": "^7.14.0",
+    "music-metadata": "^11.12.3",
     "uuid": "^9.0.1"
   }
 }
