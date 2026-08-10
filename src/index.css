@@ -432,6 +432,7 @@ bottom: 25px;
   /* left: -400px; */
   right: 100%;
   margin-right: 20px;
+  display: none;
   /* background-color: white; */
   /* z-index: 10; */
 }

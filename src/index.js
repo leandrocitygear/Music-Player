@@ -1,5 +1,4 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const { error } = require('node:console');
 const path = require('node:path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -21,8 +20,8 @@ const createWindow = () => {
     },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 
@@ -31,11 +30,14 @@ const createWindow = () => {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
+  
+  
+};
 
   ipcMain.on('open-file-dialog', (event) => {
     dialog.showOpenDialog({
 
-      filter: [
+      filters: [
         {
           name: 'Music files',
           extensions: ['mp3', 'wav', 'aac', 'm4a', 'flac', 'wma']
@@ -50,9 +52,6 @@ const createWindow = () => {
       console.error(err);
     });
   });
-
- 
-};
 
 // This method will be called when Electron has finishe
 // initialization and is ready to create browser windo.
