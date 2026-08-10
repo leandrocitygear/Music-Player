@@ -40,38 +40,6 @@ html, #body {
   border: solid white 1px;
 }
 
-.topNav {
-  position: absolute;
-  right: 328px;
-  top: 40px;
-  /* border: solid 1px; */
-  /* padding: 2px; */
-  margin-top: 5px;
-  z-index: 5;
-  color: white;
-}
-
-ul {
-  list-style: none;
-  font-size: 11px;
-}
-
-li {
-  color: gray;
-}
-
-li:hover {
-  color: white;
-}
-
-button {
-  background-color: #ffc266;
-}
-
-button:hover {
-  background-color: aqua;
-}
-
 
 .logo {
   /* border: solid red; */
@@ -83,8 +51,7 @@ button:hover {
   position:absolute;
   z-index: 0;
   -webkit-app-region: drag;
-  -webkit-user-select:none;
-
+  -webkit-user-select: none;
   color: white;
 }
 
@@ -401,20 +368,24 @@ bottom: 25px;
 #queue {
   position: absolute;
   bottom: 315px;
+  /* bottom: 30%; */
   left: 50px;
+  /* left: 2.5%; */
   border: solid white 1px;
   height: 40%;
   /* width: 25%; */
-  width: 255px;
+  width: 257px;
+  /* width: 14%; */
   /* overflow: hidden; */
   /* display: none; */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  padding: 2px;
+  /* padding: 2px; */
+
   display: none;
 }
 
 #queueOverlay {
-   position: absolute;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
@@ -422,13 +393,24 @@ bottom: 25px;
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-#queueSong {
+#queueList {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  gap: 4px;
+  /* border: solid red 1px; */
+}
+
+.queueSong {
+  /* position: absolute; */
   border: solid 1px white;
   padding: 2px;
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-bottom: 2px;
+  margin: 2px;
 }
 
 #queueArt {
@@ -439,3 +421,101 @@ bottom: 25px;
   color: white;
 }
 
+#trackListContainer {
+ position: absolute;
+  border: solid white 1px;
+  height: 80%;
+  /* width: 400px; */
+  width: 30%;
+  top: 0;
+  bottom: 0;
+  /* left: -400px; */
+  right: 100%;
+  margin-right: 20px;
+  /* background-color: white; */
+  /* z-index: 10; */
+}
+
+#trackListOverlay {
+ position: absolute;
+ top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+#selectedAlbumContainer {
+  position: absolute;
+  /* border: solid red 1px; */
+  width: 100%;
+  height: 100%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px;
+}
+
+#selectedAlbum {
+  border: solid white 1px;
+  display: flex;
+  align-items: center;
+  height: 30%;
+  padding: 4px;
+  gap: 4px;
+}
+
+#selectedAlbumArt {
+  /* height: 150px; */
+  height: 85%;
+  border: solid white 1px;
+}
+
+#selectedAlbumInfo {
+  /* border: solid white 1px; */
+  height: 85%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px;
+  min-width: 0;
+}
+
+#selectedAlbumInfo p {
+    margin: 0;
+    min-width: 0;
+    font-size: clamp(10px, 1vw, 16px);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#songListContainer {
+  border: solid 1px white;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px;
+  height: 70%;
+}
+
+.songContainer {
+ border: solid white 1px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2px;
+}
+
+.songContainer:hover {
+   background-color: rgba(95, 92, 92, 0.4);
+}
+
+#leftSpan {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
