@@ -25,13 +25,166 @@ document.querySelector('.nowPlaying').addEventListener('click', () => {
   }
 });
 
-const musicClick = document.querySelector('.musicbox').addEventListener('click', () => {
-  const trackListBox = document.getElementById('trackListContainer');
-  if (trackListBox.style.display === 'block') {
-    trackListBox.style.display = 'none';
-  } else {
-    trackListBox.style.display = 'block'
+
+console.log("🔥 DISCOUT RENDERER LOADED");
+document.addEventListener("DOMContentLoaded", () => {
+
+const library = {
+  albums: [{
+      title: "Parachutes",
+      artist: "Coldplay",
+      artwork: "./Parachutes.png"
+    }],
+  artists: [{
+      name: "Coldplay",
+      artwork: "./coldplay.jfif"
+    }],
+  songs: [{
+      title: "Shiver",
+      artist: "Coldplay",
+      album: "Parachutes",
+      artwork: "./Parachutes.png",
+      path: "./02 - Shiver.m4a"
+    }],
+  genres: [{
+      name: "Alternative Rock"
+    }],
+  playlist: []
+};
+
+let activeTab = 'artists';
+
+function renderCurrentView() {
+  switch (activeTab) {
+    case "albums":
+      renderAlbums();
+      break;
+    case "songs":
+      renderSongs();
+      break;
+    case "artists":
+      renderArtists();
+      break;
+    case "genres":
+      renderGenres();
+      break;
+    case "playlist":
+      renderPlaylists();
+      break;
   }
+};
+
+function renderAlbums() {
+  const results = document.getElementById('results');
+
+    const testAlbums = library.albums.flatMap(album =>
+    Array(60).fill(album)
+  );
+
+  results.innerHTML = `
+    <div id="albumWindow">
+    ${library.albums.map(album => `
+      <div class="musicbox">
+     <img class="art" src="${album.artwork}" />
+     <p class="alb">${album.title}</p>
+     <p class="artistsName">${album.artist}</p>
+    </div>
+      `).join("")}
+    </div>
+    `
+};
+
+function renderArtists() {
+  const results = document.getElementById('results');
+
+  results.innerHTML = `
+  <div id="artistWindow">
+  ${library.artists.map(artist => `
+    <div class="artistBox">
+      <img class="artistImg" src="${artist.artwork}" />
+      <p class="artistName">${artist.name}</p>
+    </div>
+    `).join("")}
+    </div>
+    `
+};
+
+function renderSongs() {
+  const results = document.getElementById('results');
+
+  results.innerHTML = library.songs.map(song => `
+    <div class="songBox">
+    <img class="songImg" src="${song.artwork}" />
+    <p class="songTitle">${song.title}</p>
+    <p class="songArtist">${song.artist}</p>
+    <p class="songAlbum">${song.album}</p>
+    </div>
+    `).join("");
+}
+
+function renderGenres() {
+  const results = document.getElementById('results');
+
+  results.innerHTML = library.genres.map(genre => `
+      <div class="genreBox">
+        <p class="genreName">${genre.name}</p>
+      </div>
+    `).join("");
+};
+
+function renderPlaylists() {
+  const results = document.getElementById('results');
+
+  results.innerHTML = library.playlist.map(playlist => `
+    <div class="playlistBox">
+    <p class="playlistName"></p>
+    </div>
+    `).join("");
+}
+
+const musicTabs = document.querySelectorAll('.musicTabs'); 
+
+musicTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    activeTab = tab.id;
+
+    musicTabs.forEach(tab => {
+      tab.classList.remove('active');
+    });
+
+    tab.classList.add('active');
+    
+    renderCurrentView();
+  });
+});
+
+ // Albums is the default tab
+  document
+    .getElementById("artists")
+    .classList.add("active");
+
+
+  // Load Albums immediately
+  renderCurrentView();
+
+  const results = document.getElementById('results');
+
+  results.addEventListener('click', (event) => {
+
+    const musicClick = event.target.closest('.musicbox')
+
+    if (!musicClick) return;
+
+    const trackListBox = document.getElementById('trackListContainer');
+    if (trackListBox.style.display === 'block') {
+      trackListBox.style.display = 'none';
+    } else {
+      trackListBox.style.display = 'block'
+    }
+
+  });
+
+
 });
 
 // let allFilePaths = [];
