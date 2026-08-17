@@ -97,14 +97,21 @@ function renderAlbums() {
 function renderArtists() {
   const results = document.getElementById('results');
 
+   const testArtist = library.artists.flatMap(artist =>
+    Array(5).fill(artist)
+  );
+
   results.innerHTML = `
   <div id="artistWindow">
-  ${library.artists.map(artist => `
+  <div id=artistList>
+  ${testArtist.map(artist => `
     <div class="artistBox">
       <img class="artistImg" src="${artist.artwork}" />
       <p class="artistName">${artist.name}</p>
     </div>
     `).join("")}
+    </div>
+    <div id="artistMusicResults"></div>
     </div>
     `
 };
