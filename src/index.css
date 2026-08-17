@@ -329,7 +329,7 @@ bottom: 25px;
 #albumWindow {
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   display:grid;
   grid-template-columns: repeat(auto-fit, 168px);
   grid-auto-rows: max-content;
@@ -363,6 +363,10 @@ bottom: 25px;
  padding: 2px;
  /* text-align: center; */
  /* height: 60%; */
+}
+
+.musicbox:hover {
+  background-color: rgba(95, 92, 92, 0.4);
 }
 
 .art {
@@ -554,7 +558,7 @@ bottom: 25px;
    width: 100%;
   height: 100%;
   display:grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr 2fr;
   gap: 8px;
   /* justify-content: center; */
   padding: 8px;
@@ -571,6 +575,8 @@ bottom: 25px;
 
 #artistMusicResults {
   border: solid white 1px;
+  padding: 2px;
+  overflow-y: auto;
 }
 
 #artistList::-webkit-scrollbar {
@@ -597,9 +603,14 @@ bottom: 25px;
   color: white;
   align-items: center;
   gap: 4px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+}
+
+.artistBox:hover {
+  background-color: rgba(95, 92, 92, 0.4);
 }
 
 .artistImg {
   height: 50px;
 }
+

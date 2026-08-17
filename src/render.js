@@ -33,7 +33,8 @@ const library = {
   albums: [{
       title: "Parachutes",
       artist: "Coldplay",
-      artwork: "./Parachutes.png"
+      artwork: "./Parachutes.png",
+      year: "2000"
     }],
   artists: [{
       name: "Coldplay",
@@ -77,10 +78,6 @@ function renderCurrentView() {
 function renderAlbums() {
   const results = document.getElementById('results');
 
-    const testAlbums = library.albums.flatMap(album =>
-    Array(60).fill(album)
-  );
-
   results.innerHTML = `
     <div id="albumWindow">
     ${library.albums.map(album => `
@@ -98,20 +95,28 @@ function renderArtists() {
   const results = document.getElementById('results');
 
    const testArtist = library.artists.flatMap(artist =>
-    Array(5).fill(artist)
+    Array(50).fill(artist)
   );
 
   results.innerHTML = `
   <div id="artistWindow">
   <div id=artistList>
-  ${testArtist.map(artist => `
+  ${library.artists.map(artist => `
     <div class="artistBox">
       <img class="artistImg" src="${artist.artwork}" />
       <p class="artistName">${artist.name}</p>
     </div>
     `).join("")}
     </div>
-    <div id="artistMusicResults"></div>
+    <div id="artistMusicResults">
+    ${library.albums.map(album => `
+      <div class="artistAlbumBox">
+      <img class="artistAlbumImg" src="${album.artwork}"/>
+      <p>${album.title}</p>
+      <p>${album.year}</p>
+      </div>
+      `)}
+    </div>
     </div>
     `
 };
