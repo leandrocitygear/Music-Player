@@ -53,7 +53,7 @@ const library = {
   playlist: []
 };
 
-let activeTab = 'artists';
+let activeTab = 'songs';
 
 function renderCurrentView() {
   switch (activeTab) {
@@ -133,17 +133,47 @@ function renderSongs() {
   const results = document.getElementById('results');
 
   const testSongs = library.songs.flatMap(song =>
-    Array(15).fill(song)
+    Array(35).fill(song)
   );
 
-  results.innerHTML = library.songs.map(song => `
-    <div class="songBox">
-    <img class="songImg" src="${song.artwork}" />
-    <p class="songTitle">${song.title}</p>
-    <p class="songArtist">${song.artist}</p>
-    <p class="songAlbum">${song.album}</p>
-    </div>
-    `).join("");
+  results.innerHTML = `
+  <div id="songWindow">
+
+      <div class="songHeader">
+        <div class="coverColumn"></div>
+        <div class="titleColumn">TITLE</div>
+        <div class="artistColumn">ARTIST</div>
+        <div class="albumColumn">ALBUM</div>
+      </div>
+
+      <div class="songBody">
+  ${library.songs.map(song => `
+    <div class="songRow">
+
+            <div class="coverColumn">
+              <img
+                class="songImg"
+                src="${song.artwork}"
+              />
+            </div>
+
+            <div class="titleColumn">
+              ${song.title}
+            </div>
+
+            <div class="artistColumn">
+              ${song.artist}
+            </div>
+
+            <div class="albumColumn">
+              ${song.album}
+            </div>
+
+          </div>
+    `).join("")}
+
+  </div>
+    `
 }
 
 function renderGenres() {
@@ -184,7 +214,7 @@ musicTabs.forEach(tab => {
 
  // Albums is the default tab
   document
-    .getElementById("artists")
+    .getElementById("songs")
     .classList.add("active");
 
 
