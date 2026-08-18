@@ -842,12 +842,12 @@ bottom: 25px;
 #addMenu {
   position: absolute;
 
-  top: 60px;
-  left: 20px;
+  bottom: 25px;
+  right: 5px;
 
   width: 210px;
 
-  /* background: rgba(20, 20, 20, 0.95); */
+  background: rgba(20, 20, 20, 0.6);
 
   border: solid 1px white;
 
@@ -859,7 +859,7 @@ bottom: 25px;
 
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 
-  backdrop-filter: blur(1px);
+  backdrop-filter: blur(2px);
 }
 
 .addMenuTitle {
@@ -867,7 +867,7 @@ bottom: 25px;
 
   font-size: 13px;
 
-  color: rgba(255, 255, 255, 0.5);
+  color: white;
 }
 
 #addMenu button {
