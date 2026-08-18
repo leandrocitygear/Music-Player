@@ -50,10 +50,12 @@ const library = {
   genres: [{
       name: "Alternative Rock"
     }],
-  playlist: []
+  playlist: [{
+    name: "Playlist for home"
+  }]
 };
 
-let activeTab = 'songs';
+let activeTab = 'albums';
 
 function renderCurrentView() {
   switch (activeTab) {
@@ -132,9 +134,6 @@ function renderArtists() {
 function renderSongs() {
   const results = document.getElementById('results');
 
-  const testSongs = library.songs.flatMap(song =>
-    Array(35).fill(song)
-  );
 
   results.innerHTML = `
   <div id="songWindow">
@@ -179,21 +178,83 @@ function renderSongs() {
 function renderGenres() {
   const results = document.getElementById('results');
 
-  results.innerHTML = library.genres.map(genre => `
-      <div class="genreBox">
-        <p class="genreName">${genre.name}</p>
+
+  //    const testGenres = library.genres.flatMap(genre =>
+  //   Array(5).fill(genre)
+  // );
+
+  results.innerHTML = `
+  
+  <div id="genreWindow">
+  <div id=genreList>
+  ${library.genres.map(genre => `
+    <div class="genreBox">
+      <p class="genreName">${genre.name}</p>
+    </div>
+    `).join("")}
+    </div>
+    <div id="genreMusicResults">
+    ${library.albums.map(album => `
+      <div class="artistAlbumBox">
+      <img class="artistAlbumImg" src="${album.artwork}"/>
+      <div class="artistAlbumInfo">
+      <p>${album.title}</p>
+      <p>${album.year}</p>
       </div>
-    `).join("");
+      ${library.songs.map(song => `
+        <div class="songContainer">
+          <div id="leftSpan">
+            <img src="./icons/volume.png" alt="">
+            <p>1</p>
+            <p>${song.title}</p>
+          </div>
+          <img src="./icons/favorite.png" alt="">
+        </div>
+        `).join("")}
+      </div>
+      `).join("")}
+    </div>
+    </div>
+    
+    `
 };
 
 function renderPlaylists() {
   const results = document.getElementById('results');
 
-  results.innerHTML = library.playlist.map(playlist => `
-    <div class="playlistBox">
-    <p class="playlistName"></p>
+  results.innerHTML = `
+  
+  <div id="playlistWindow">
+  <div id=playlistList>
+  ${library.playlist.map(playlist => `
+    <div class="genreBox">
+      <p class="genreName">${playlist.name}</p>
     </div>
-    `).join("");
+    `).join("")}
+    </div>
+    <div id="playlistMusicResults">
+    ${library.albums.map(album => `
+      <div class="artistAlbumBox">
+      <img class="artistAlbumImg" src="${album.artwork}"/>
+      <div class="artistAlbumInfo">
+      <p>${album.title}</p>
+      <p>${album.year}</p>
+      </div>
+      ${library.songs.map(song => `
+        <div class="songContainer">
+          <div id="leftSpan">
+            <img src="./icons/volume.png" alt="">
+            <p>1</p>
+            <p>${song.title}</p>
+          </div>
+          <img src="./icons/favorite.png" alt="">
+        </div>
+        `).join("")}
+      </div>
+      `).join("")}
+    </div>
+    </div>
+    `
 }
 
 const musicTabs = document.querySelectorAll('.musicTabs'); 
@@ -214,7 +275,7 @@ musicTabs.forEach(tab => {
 
  // Albums is the default tab
   document
-    .getElementById("songs")
+    .getElementById("albums")
     .classList.add("active");
 
 

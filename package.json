@@ -30,6 +30,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
     "electron-squirrel-startup": "^1.0.0",
     "jsmediatags": "^1.1.0",
     "music-metadata": "^11.12.3",
