@@ -94,10 +94,6 @@ function renderAlbums() {
 function renderArtists() {
   const results = document.getElementById('results');
 
-   const testArtist = library.artists.flatMap(artist =>
-    Array(50).fill(artist)
-  );
-
   results.innerHTML = `
   <div id="artistWindow">
   <div id=artistList>
@@ -112,10 +108,22 @@ function renderArtists() {
     ${library.albums.map(album => `
       <div class="artistAlbumBox">
       <img class="artistAlbumImg" src="${album.artwork}"/>
+      <div class="artistAlbumInfo">
       <p>${album.title}</p>
       <p>${album.year}</p>
       </div>
-      `)}
+      ${library.songs.map(song => `
+        <div class="songContainer">
+          <div id="leftSpan">
+            <img src="./icons/volume.png" alt="">
+            <p>1</p>
+            <p>${song.title}</p>
+          </div>
+          <img src="./icons/favorite.png" alt="">
+        </div>
+        `).join("")}
+      </div>
+      `).join("")}
     </div>
     </div>
     `
@@ -123,6 +131,10 @@ function renderArtists() {
 
 function renderSongs() {
   const results = document.getElementById('results');
+
+  const testSongs = library.songs.flatMap(song =>
+    Array(15).fill(song)
+  );
 
   results.innerHTML = library.songs.map(song => `
     <div class="songBox">
