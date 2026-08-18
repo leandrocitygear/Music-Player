@@ -1,19 +1,15 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
-const { addAlbum, addArtist, addGenre, addSong } = require('./queries');
 
 console.log('PRELOAD LOADED');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    openFileDialog: () => {
-        ipcRenderer.send('open-file-dialog');
-    },
 
-    onSelectedFiles: (callback) => {
-        ipcRenderer.on('selected-files', (event, filePaths) => {
-            callback(filePaths);
-        });
-    },
+    selectMusicFiles: () =>
+  ipcRenderer.invoke('select-music-files'),
+
+selectMusicFolder: () =>
+  ipcRenderer.invoke('select-music-folder'),
 
     // Database
   getAlbums: () =>
@@ -31,17 +27,51 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getPlaylists: () =>
     ipcRenderer.invoke("get-playlists"),
 
-  addAlbum: () =>
-    ipcRenderer.invoke("add-album"),
+  addAlbum: (album) =>
+      ipcRenderer.invoke(
+        'add-album',
+        album
+      ),
 
-  addArtist: () =>
-    ipcRenderer.invoke("add-artist"),
+    addArtist: (artist) =>
+      ipcRenderer.invoke(
+        'add-artist',
+        artist
+      ),
 
-  addGenre: () =>
-    ipcRenderer.invoke("add-genre"),
+    addGenre: (genre) =>
+      ipcRenderer.invoke(
+        'add-genre',
+        genre
+      ),
 
-  addSong: () =>
-    ipcRenderer.invoke("add-song")
+    addSong: (song) =>
+      ipcRenderer.invoke(
+        'add-song',
+        song
+      ),
+
+    addFolder: (folder) =>
+      ipcRenderer.invoke(
+        'add-folder',
+        folder
+      ),
+
+      // =========================
+    // IMPORTER
+    // =========================
+
+    importSong: (filePath) =>
+      ipcRenderer.invoke(
+        'import-song',
+        filePath
+      ),
+
+    importFolder: (folderPath) =>
+      ipcRenderer.invoke(
+        'import-folder',
+        folderPath
+      )
 
 
 });

@@ -12,8 +12,15 @@ const {
   addArtist,
   addGenre,
   addAlbum,
-  addSong
-} = require("./database");
+  addSong,
+  addFolder
+} = require("./queries");
+
+const {
+  importSong,
+  scanFolder
+} = require('./importer');
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -48,24 +55,52 @@ const createWindow = () => {
   
 };
 
-  ipcMain.on('open-file-dialog', (event) => {
-    dialog.showOpenDialog({
+  ipcMain.handle('select-music-files', async () => {
 
-      filters: [
-        {
-          name: 'Music files',
-          extensions: ['mp3', 'wav', 'aac', 'm4a', 'flac', 'wma']
-        }
-      ],
-      properties: ['openFile', 'multiSelections']
-    }).then(result => {
-      if (!result.canceled) {
-        event.sender.send('selected-files', result.filePaths);
+  const result = await dialog.showOpenDialog({
+    filters: [
+      {
+        name: 'Music files',
+        extensions: [
+          'mp3',
+          'wav',
+          'aac',
+          'm4a',
+          'flac',
+          'wma',
+          'ogg',
+          'opus'
+        ]
       }
-    }).catch(err => {
-      console.error(err);
-    });
+    ],
+    properties: [
+      'openFile',
+      'multiSelections'
+    ]
   });
+
+  if (result.canceled) {
+    return [];
+  }
+
+  return result.filePaths;
+});
+
+
+ipcMain.handle('select-music-folder', async () => {
+
+  const result = await dialog.showOpenDialog({
+    properties: [
+      'openDirectory'
+    ]
+  });
+
+  if (result.canceled) {
+    return null;
+  }
+
+  return result.filePaths[0];
+});
 
   ipcMain.handle("get-albums", () => {
   return getAlbums();
@@ -87,20 +122,54 @@ ipcMain.handle("get-playlists", () => {
   return getPlaylists();
 });
 
-ipcMain.handle("add-album", () => {
-  return addAlbum();
+ipcMain.handle('add-album', (event, album) => {
+  return addAlbum(album);
 });
 
-ipcMain.handle("add-artist", () => {
-  return addArtist();
+ipcMain.handle('add-artist', (event, artist) => {
+  return addArtist(
+    artist.name,
+    artist.sortName,
+    artist.artworkPath
+  );
 });
 
-ipcMain.handle("add-genre", () => {
-  return addGenre();
+ipcMain.handle('add-genre', (event, genre) => {
+  return addGenre(genre.name);
 });
 
-ipcMain.handle("add-song", () => {
-  return addSong();
+ipcMain.handle('add-song', (event, song) => {
+  return addSong(song);
+});
+
+ipcMain.handle('add-folder', (event, folder) => {
+  return addFolder(
+    folder.path,
+    folder.name
+  );
+});
+
+ipcMain.handle('import-song', async (event, filePath) => {
+
+  return await importSong(filePath);
+
+}); 
+
+
+ipcMain.handle('import-folder', async (event, folderPath) => {
+
+  const folderName = path.basename(folderPath);
+
+  const folderId = addFolder(
+    folderPath,
+    folderName
+  );
+
+  return await scanFolder(
+    folderPath,
+    folderId
+  );
+
 });
 
 // This method will be called when Electron has finishe

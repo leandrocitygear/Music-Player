@@ -838,3 +838,67 @@ bottom: 25px;
   padding: 2px;
   overflow-y: auto;
 }
+
+#addMenu {
+  position: absolute;
+
+  top: 60px;
+  left: 20px;
+
+  width: 210px;
+
+  /* background: rgba(20, 20, 20, 0.95); */
+
+  border: solid 1px white;
+
+  /* border-radius: 8px; */
+
+  padding: 6px;
+
+  z-index: 1000;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+
+  backdrop-filter: blur(1px);
+}
+
+.addMenuTitle {
+  padding: 8px 10px;
+
+  font-size: 13px;
+
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#addMenu button {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px;
+
+    border: solid 1px transparent;
+
+
+  background: transparent;
+
+  color: white;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  /* border-radius: 5px; */
+}
+
+#addMenu button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border: solid 1px white;
+}
+
+#addMenu button span {
+  width: 20px;
+}

@@ -323,6 +323,35 @@ function addSong(song) {
 };
 
 
+function addFolder(folderPath, name) {
+
+  const existing = db.prepare(`
+    SELECT id
+    FROM folders
+    WHERE path = ?
+  `).get(folderPath);
+
+
+  if (existing) {
+    return existing.id;
+  }
+
+
+  const result = db.prepare(`
+    INSERT INTO folders (
+      path,
+      name
+    )
+    VALUES (?, ?)
+  `).run(
+    folderPath,
+    name
+  );
+
+
+  return result.lastInsertRowid;
+};
+
 
 
 module.exports = {
@@ -336,5 +365,6 @@ module.exports = {
   addArtist,
   addGenre,
   addAlbum,
-  addSong
+  addSong,
+  addFolder
 };
