@@ -8,15 +8,20 @@ function getAlbums() {
   return db.prepare(`
     SELECT
       albums.id,
-      albums.title,
-      albums.sort_title,
-      albums.artwork_path,
-      albums.release_date,
-      albums.release_year,
-      albums.total_tracks,
-      albums.disc_count,
-      artists.name AS artist,
-      genres.name AS genre
+  albums.title,
+  albums.sort_title,
+
+  albums.artist_id,
+  albums.genre_id,
+
+  albums.artwork_path,
+  albums.release_date,
+  albums.release_year,
+  albums.total_tracks,
+  albums.disc_count,
+
+  artists.name AS artist,
+  genres.name AS genre
     FROM albums
     LEFT JOIN artists
       ON albums.artist_id = artists.id

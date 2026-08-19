@@ -16,6 +16,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   
   let activeTab = 'albums';
+  let selectedArtistId = null;
+let selectedGenreId = null;
+let selectedPlaylistId = null;
+
+function getArtwork(path, fallback) {
+
+  if (!path) {
+    return fallback;
+  }
+
+  return `file://${path.replace(/\\/g, '/')}`;
+}
   
   async function loadLibrary() {
     
@@ -210,6 +222,103 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 };
 
+
+function renderArtistMusic() {
+
+  if (!selectedArtistId) {
+    return `
+      <div class="emptyMusicMessage">
+        Select an artist
+      </div>
+    `;
+  }
+
+  const artistSongs = library.songs.filter(
+    song => song.artist_id === selectedArtistId
+  );
+
+  if (artistSongs.length === 0) {
+    return `
+      <div class="emptyMusicMessage">
+        No songs found
+      </div>
+    `;
+  }
+
+  // Group songs by album
+  const albums = [];
+
+  artistSongs.forEach(song => {
+
+    let album = albums.find(
+      album => album.id === song.album_id
+    );
+
+    if (!album) {
+
+      album = {
+        id: song.album_id,
+        title: song.album,
+        artwork_path: song.artwork_path,
+        release_year: song.release_year,
+        songs: []
+      };
+
+      albums.push(album);
+    }
+
+    album.songs.push(song);
+  });
+
+  return albums.map(album => `
+
+    <div class="artistAlbumBox">
+
+      <img 
+        class="artistAlbumImg"
+        src="${album.artwork_path || './icons/album.png'}"
+      />
+
+      <div class="artistAlbumInfo">
+        <p>${album.title || 'Unknown Album'}</p>
+        <p>${album.release_year || ''}</p>
+      </div>
+
+      ${album.songs.map((song, index) => `
+
+        <div 
+          class="songContainer"
+          data-song-id="${song.id}"
+        >
+
+          <div id="leftSpan">
+
+            <img 
+              src="./icons/volume.png" 
+              alt=""
+            >
+
+            <p>${index + 1}</p>
+
+            <p>${song.title}</p>
+
+          </div>
+
+          <img 
+            src="./icons/favorite.png" 
+            alt=""
+          >
+
+        </div>
+
+      `).join("")}
+
+    </div>
+
+  `).join("");
+}
+
+
 function renderAlbums() {
   const results = document.getElementById('results');
 
@@ -233,33 +342,14 @@ function renderArtists() {
   <div id="artistWindow">
   <div id=artistList>
   ${library.artists.map(artist => `
-    <div class="artistBox" data-artist-id="${artist.id}" >
+    <div class="artistBox ${artist.id === selectedArtistId ? 'active' : ''}" data-artist-id="${artist.id}" >
       <img class="artistImg" src="${artist.artwork_path}" />
       <p class="artistName">${artist.name}</p>
     </div>
     `).join("")}
     </div>
     <div id="artistMusicResults">
-    
-      <div class="artistAlbumBox">
-      <img class="artistAlbumImg" src=""/>
-      <div class="artistAlbumInfo">
-      <p></p>
-      <p></p>
-      </div>
-      
-        <div class="songContainer">
-          <div id="leftSpan">
-            <img src="./icons/volume.png" alt="">
-            <p>1</p>
-            <p></p>
-          </div>
-          <img src="./icons/favorite.png" alt="">
-        </div>
-        
-      </div>
-      
-    </div>
+    ${renderArtistMusic()}
     </div>
     `
 };
@@ -358,9 +448,9 @@ function renderPlaylists() {
   <div id="playlistWindow">
   <div id=playlistList>
   ${library.playlists.map(playlist => `
-    <div class="genreBox"
+    <div class="playlistBox"
     data-playlist-id="${playlist.id}">
-      <p class="genreName">${playlist.name}</p>
+      <p class="playlistName">${playlist.name}</p>
     </div>
     `).join("")}
     </div>
@@ -420,16 +510,112 @@ musicTabs.forEach(tab => {
     
     results.addEventListener('click', (event) => {
       
-      const musicClick = event.target.closest('.musicbox')
+       // =========================
+  // ALBUM CLICK
+  // =========================
 
-    if (!musicClick) return;
-    
-    const trackListBox = document.getElementById('trackListContainer');
+  const musicClick = event.target.closest('.musicbox');
+
+  if (musicClick) {
+
+    const albumId = Number(
+      musicClick.dataset.albumId
+    );
+
+    console.log("Selected album:", albumId);
+
+    const trackListBox =
+      document.getElementById('trackListContainer');
+
     if (trackListBox.style.display === 'block') {
       trackListBox.style.display = 'none';
     } else {
-      trackListBox.style.display = 'block'
+      trackListBox.style.display = 'block';
     }
+
+    return;
+  }
+
+
+  // =========================
+  // ARTIST CLICK
+  // =========================
+
+  const artistClick =
+    event.target.closest('.artistBox');
+
+  if (!artistClick) {
+    return;
+  }
+
+  selectedArtistId =
+    Number(artistClick.dataset.artistId);
+
+
+  // Remove active from all artists
+  document
+    .querySelectorAll('.artistBox')
+    .forEach(artist => {
+      artist.classList.remove('active');
+    });
+
+
+  // Highlight selected artist
+  artistClick.classList.add('active');
+
+
+  // Only update the music section
+  const artistMusicResults =
+    document.getElementById('artistMusicResults');
+
+  artistMusicResults.innerHTML =
+    renderArtistMusic();
+
+
+  // =========================
+  // GENRE CLICK
+  // =========================
+
+  const genreClick =
+    event.target.closest('.genreBox');
+
+  if (genreClick) {
+
+    selectedGenreId =
+      Number(genreClick.dataset.genreId);
+
+    console.log(
+      "Selected genre:",
+      selectedGenreId
+    );
+
+    renderGenres();
+
+    return;
+  }
+
+
+  // =========================
+  // PLAYLIST CLICK
+  // =========================
+
+  const playlistClick =
+    event.target.closest('.playlistBox');
+
+  if (playlistClick) {
+
+    selectedPlaylistId =
+      Number(playlistClick.dataset.playlistId);
+
+    console.log(
+      "Selected playlist:",
+      selectedPlaylistId
+    );
+
+    renderPlaylists();
+
+    return;
+  }
     
   });
   

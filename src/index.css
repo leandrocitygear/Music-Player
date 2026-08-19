@@ -606,7 +606,7 @@ bottom: 25px;
 }
 
 .artistBox {
-  border: solid white 1px;
+  border: solid transparent 1px;
   width: 100%;
   height: fit-content;
   padding: 2px;
@@ -618,6 +618,13 @@ bottom: 25px;
 }
 
 .artistBox:hover {
+  background-color: rgba(95, 92, 92, 0.4);
+  cursor: pointer;
+  border: solid white 1px;
+}
+
+.artistBox.active {
+  border: solid white 1px;
   background-color: rgba(95, 92, 92, 0.4);
 }
 
