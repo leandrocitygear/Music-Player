@@ -1,166 +1,196 @@
 
-// const mm = require('music-metadata');
-
-const addFiles = document.getElementById('settings');
-
-addFiles.onclick = () => {
-  showAddMenu();
-};
-
-function showAddMenu() {
-
-  // Don't create duplicates
-  if (document.getElementById('addMenu')) {
-    return;
-  }
-
-  const menu = document.createElement('div');
-
-  menu.id = 'addMenu';
-
-  menu.innerHTML = `
-    <div class="addMenuTitle">
-      Add to Library
-    </div>
-
-    <button id="addMusicFiles">
-    <img src="./icons/audio_file.png" alt="">
-      <span></span>
-      Add Music Files
-    </button>
-
-    <button id="addMusicFolder">
-    <img src="./icons/folder.png" alt="">
-      <span></span>
-      Add Music Folder
-    </button>
-  `;
-
-  document.body.appendChild(menu);
 
 
-  // Add individual files
-  document
-    .getElementById('addMusicFiles')
-    .addEventListener('click', async () => {
 
-      menu.remove();
-
-      const files =
-        await window.electronAPI.selectMusicFiles();
-
-      console.log('Selected files:', files);
-
-      for (const file of files) {
-
-        const result =
-          await window.electronAPI.importSong(file);
-
-        console.log('Imported:', result);
-      }
-
-    });
-
-
-  // Add folder
-  document
-    .getElementById('addMusicFolder')
-    .addEventListener('click', async () => {
-
-      menu.remove();
-
-      const folder =
-        await window.electronAPI.selectMusicFolder();
-
-      if (!folder) {
-        return;
-      }
-
-      console.log('Selected folder:', folder);
-
-      const result =
-        await window.electronAPI.importFolder(folder);
-
-      console.log('Folder imported:', result);
-
-    });
-
-
-  // Close menu when clicking outside
-  setTimeout(() => {
-
-    document.addEventListener(
-      'click',
-      closeAddMenu,
-      { once: true }
-    );
-
-  }, 0);
-
-
-  function closeAddMenu(event) {
-
-    if (!menu.contains(event.target) &&
-        event.target !== addFiles) {
-
-      menu.remove();
-    }
-
-  }
-
-}
-
-document.getElementById('menu').addEventListener('click', () => {
-const nav = document.getElementById('navigation');
-if (nav.style.display === "block") {
-  nav.style.display = 'none';
-} else {
-  nav.style.display = 'block';
-}
-});
-
-document.querySelector('.nowPlaying').addEventListener('click', () => {
-  const queue = document.getElementById('queue');
-  if (queue.style.display === 'block') {
-    queue.style.display = 'none';
-  } else {
-    queue.style.display = 'block';
-  }
-});
 
 
 console.log("🔥 DISCOUT RENDERER LOADED");
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  
+  const library = {
+    albums: [],
+    artists: [],
+    songs: [],
+    genres: [],
+    playlists: []
+  };
+  
+  let activeTab = 'albums';
+  
+  async function loadLibrary() {
+    
+    try {
+      
+      const data =
+      await window.electronAPI.getLibrary();
 
-const library = {
-  albums: [{
-      title: "Parachutes",
-      artist: "Coldplay",
-      artwork: "./Parachutes.png",
-      year: "2000"
-    }],
-  artists: [{
-      name: "Coldplay",
-      artwork: "./coldplay.jfif"
-    }],
-  songs: [{
-      title: "Shiver",
-      artist: "Coldplay",
-      album: "Parachutes",
-      artwork: "./Parachutes.png",
-      path: "./02 - Shiver.m4a"
-    }],
-  genres: [{
-      name: "Alternative Rock"
-    }],
-  playlist: [{
-    name: "Playlist for home"
-  }]
-};
+    library.albums = data.albums;
+    library.artists = data.artists;
+    library.songs = data.songs;
+    library.genres = data.genres;
+    library.playlists = data.playlists;
 
-let activeTab = 'albums';
+    console.log("Library loaded:", library);
+      
+      console.log("Albums:", library.albums);
+      console.log("Artists:", library.artists);
+      console.log("Songs:", library.songs);
+      console.log("Genres:", library.genres);
+      console.log("Playlists:", library.playlists);
+      
+      renderCurrentView();
+      
+    } catch (error) {
+      console.error(
+        "Failed to load library:",
+        error
+      );
+    }
+  }
+  
+  
+  const addFiles = document.getElementById('settings');
+  
+  addFiles.onclick = () => {
+    showAddMenu();
+  };
+  
+  function showAddMenu() {
+    
+    // Don't create duplicates
+    if (document.getElementById('addMenu')) {
+      return;
+    }
+    
+    const menu = document.createElement('div');
+    
+    menu.id = 'addMenu';
+    
+    menu.innerHTML = `
+    <div class="addMenuTitle">
+    Add to Library
+    </div>
+    
+    <button id="addMusicFiles">
+    <img src="./icons/audio_file.png" alt="">
+    Add Music Files
+    </button>
+    
+    <button id="addMusicFolder">
+    <img src="./icons/folder.png" alt="">
+    Add Music Folder
+    </button>
+    `;
+    
+    document.body.appendChild(menu);
+    
+    
+    // Add individual files
+    document
+    .getElementById('addMusicFiles')
+    .addEventListener('click', async () => {
+      
+      menu.remove();
+      
+      const files =
+      await window.electronAPI.selectMusicFiles();
+      
+      console.log('Selected files:', files);
+      
+      for (const file of files) {
+        
+        const result =
+        await window.electronAPI.importSong(file);
+        
+        console.log('Imported:', result);
+      }
+      await loadLibrary();
+      
+    });
+    
+    
+    // Add folder
+    document
+    .getElementById('addMusicFolder')
+    .addEventListener('click', async () => {
+      
+          menu.remove();
+          
+          const folder =
+          await window.electronAPI.selectMusicFolder();
+          
+          if (!folder) {
+            return;
+          }
+          
+          console.log('Selected folder:', folder);
+          
+          const result =
+          await window.electronAPI.importFolder(folder);
+          
+          console.log('Folder imported:', result);
+          
+          await loadLibrary();
+          
+        });
+        
+        
+        // Close menu when clicking outside
+        setTimeout(() => {
+          
+          document.addEventListener(
+            'click',
+            closeAddMenu,
+            { once: true }
+          );
+          
+        }, 0);
+        
+        
+        function closeAddMenu(event) {
+          
+          if (!menu.contains(event.target) &&
+          event.target !== addFiles) {
+            
+            menu.remove();
+          }
+          
+        }
+        
+      }
+      
+      
+      document.getElementById('menu').addEventListener('click', () => {
+        const nav = document.getElementById('navigation');
+        if (nav.style.display === "block") {
+          nav.style.display = 'none';
+        } else {
+          nav.style.display = 'block';
+        }
+      });
 
-function renderCurrentView() {
+      
+      
+      document.querySelector('.nowPlaying').addEventListener('click', () => {
+        const queue = document.getElementById('queue');
+        if (queue.style.display === 'block') {
+          queue.style.display = 'none';
+        } else {
+          queue.style.display = 'block';
+        }
+      });
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      function renderCurrentView() {
   switch (activeTab) {
     case "albums":
       renderAlbums();
@@ -186,10 +216,10 @@ function renderAlbums() {
   results.innerHTML = `
     <div id="albumWindow">
     ${library.albums.map(album => `
-      <div class="musicbox">
-     <img class="art" src="${album.artwork}" />
+      <div class="musicbox" data-album-id="${album.id}" >
+     <img class="art" src="${album.artwork_path}" />
      <p class="alb">${album.title}</p>
-     <p class="artistsName">${album.artist}</p>
+     <p class="artistsName">${album.artist || 'Unknown Artist'}</p>
     </div>
       `).join("")}
     </div>
@@ -203,32 +233,32 @@ function renderArtists() {
   <div id="artistWindow">
   <div id=artistList>
   ${library.artists.map(artist => `
-    <div class="artistBox">
-      <img class="artistImg" src="${artist.artwork}" />
+    <div class="artistBox" data-artist-id="${artist.id}" >
+      <img class="artistImg" src="${artist.artwork_path}" />
       <p class="artistName">${artist.name}</p>
     </div>
     `).join("")}
     </div>
     <div id="artistMusicResults">
-    ${library.albums.map(album => `
+    
       <div class="artistAlbumBox">
-      <img class="artistAlbumImg" src="${album.artwork}"/>
+      <img class="artistAlbumImg" src=""/>
       <div class="artistAlbumInfo">
-      <p>${album.title}</p>
-      <p>${album.year}</p>
+      <p></p>
+      <p></p>
       </div>
-      ${library.songs.map(song => `
+      
         <div class="songContainer">
           <div id="leftSpan">
             <img src="./icons/volume.png" alt="">
             <p>1</p>
-            <p>${song.title}</p>
+            <p></p>
           </div>
           <img src="./icons/favorite.png" alt="">
         </div>
-        `).join("")}
+        
       </div>
-      `).join("")}
+      
     </div>
     </div>
     `
@@ -250,12 +280,13 @@ function renderSongs() {
 
       <div class="songBody">
   ${library.songs.map(song => `
-    <div class="songRow">
+    <div class="songRow" 
+    data-song-id="${song.id}">
 
             <div class="coverColumn">
               <img
                 class="songImg"
-                src="${song.artwork}"
+                src="${song.artwork_path}"
               />
             </div>
 
@@ -264,11 +295,11 @@ function renderSongs() {
             </div>
 
             <div class="artistColumn">
-              ${song.artist}
+              ${song.artist || 'Unknown Artist'}
             </div>
 
             <div class="albumColumn">
-              ${song.album}
+              ${song.album || 'Unknown Album'}
             </div>
 
           </div>
@@ -282,40 +313,37 @@ function renderGenres() {
   const results = document.getElementById('results');
 
 
-  //    const testGenres = library.genres.flatMap(genre =>
-  //   Array(5).fill(genre)
-  // );
-
   results.innerHTML = `
   
   <div id="genreWindow">
   <div id=genreList>
   ${library.genres.map(genre => `
-    <div class="genreBox">
+    <div class="genreBox"
+    data-genre-id="${genre.id}">
       <p class="genreName">${genre.name}</p>
     </div>
     `).join("")}
     </div>
     <div id="genreMusicResults">
-    ${library.albums.map(album => `
+    
       <div class="artistAlbumBox">
-      <img class="artistAlbumImg" src="${album.artwork}"/>
+      <img class="artistAlbumImg" src=""/>
       <div class="artistAlbumInfo">
-      <p>${album.title}</p>
-      <p>${album.year}</p>
+      <p></p>
+      <p></p>
       </div>
-      ${library.songs.map(song => `
+     
         <div class="songContainer">
           <div id="leftSpan">
             <img src="./icons/volume.png" alt="">
             <p>1</p>
-            <p>${song.title}</p>
+            <p></p>
           </div>
           <img src="./icons/favorite.png" alt="">
         </div>
-        `).join("")}
+       
       </div>
-      `).join("")}
+      
     </div>
     </div>
     
@@ -329,36 +357,42 @@ function renderPlaylists() {
   
   <div id="playlistWindow">
   <div id=playlistList>
-  ${library.playlist.map(playlist => `
-    <div class="genreBox">
+  ${library.playlists.map(playlist => `
+    <div class="genreBox"
+    data-playlist-id="${playlist.id}">
       <p class="genreName">${playlist.name}</p>
     </div>
     `).join("")}
     </div>
     <div id="playlistMusicResults">
-    ${library.albums.map(album => `
+    
       <div class="artistAlbumBox">
-      <img class="artistAlbumImg" src="${album.artwork}"/>
+      <img class="artistAlbumImg" src=""/>
       <div class="artistAlbumInfo">
-      <p>${album.title}</p>
-      <p>${album.year}</p>
+      <p></p>
+      <p></p>
       </div>
-      ${library.songs.map(song => `
+      
         <div class="songContainer">
           <div id="leftSpan">
             <img src="./icons/volume.png" alt="">
             <p>1</p>
-            <p>${song.title}</p>
+            <p></p>
           </div>
           <img src="./icons/favorite.png" alt="">
         </div>
-        `).join("")}
+        
       </div>
-      `).join("")}
+      
     </div>
     </div>
     `
 }
+
+
+
+
+
 
 const musicTabs = document.querySelectorAll('.musicTabs'); 
 
@@ -381,28 +415,26 @@ musicTabs.forEach(tab => {
     .getElementById("albums")
     .classList.add("active");
 
-
-  // Load Albums immediately
-  renderCurrentView();
-
-  const results = document.getElementById('results');
-
-  results.addEventListener('click', (event) => {
-
-    const musicClick = event.target.closest('.musicbox')
+    
+    const results = document.getElementById('results');
+    
+    results.addEventListener('click', (event) => {
+      
+      const musicClick = event.target.closest('.musicbox')
 
     if (!musicClick) return;
-
+    
     const trackListBox = document.getElementById('trackListContainer');
     if (trackListBox.style.display === 'block') {
       trackListBox.style.display = 'none';
     } else {
       trackListBox.style.display = 'block'
     }
-
+    
   });
-
-
+  
+  await loadLibrary();
+  
 });
 
 

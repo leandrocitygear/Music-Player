@@ -3,6 +3,7 @@ const path = require('node:path');
 const db = require("./database");
 
 const {
+  getLibrary,
   getAlbums,
   getArtists,
   getSongs,
@@ -170,6 +171,10 @@ ipcMain.handle('import-folder', async (event, folderPath) => {
     folderId
   );
 
+});
+
+ipcMain.handle("get-library", () => {
+  return getLibrary();
 });
 
 // This method will be called when Electron has finishe

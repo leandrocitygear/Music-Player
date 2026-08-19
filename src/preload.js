@@ -11,6 +11,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 selectMusicFolder: () =>
   ipcRenderer.invoke('select-music-folder'),
 
+  getLibrary: () =>
+  ipcRenderer.invoke("get-library"),
     // Database
   getAlbums: () =>
     ipcRenderer.invoke("get-albums"),
@@ -73,5 +75,5 @@ selectMusicFolder: () =>
         folderPath
       )
 
-
+      
 });

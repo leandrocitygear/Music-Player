@@ -50,19 +50,28 @@ function getArtists() {
 
 function getSongs() {
   return db.prepare(`
-    SELECT
+    SELECT 
       songs.*,
+
       artists.name AS artist,
+
       albums.title AS album,
+      albums.artwork_path AS artwork_path,
+
       genres.name AS genre
+
     FROM songs
+
     LEFT JOIN artists
       ON songs.artist_id = artists.id
+
     LEFT JOIN albums
       ON songs.album_id = albums.id
+
     LEFT JOIN genres
       ON albums.genre_id = genres.id
-    ORDER BY
+
+    ORDER BY 
       artists.sort_name,
       albums.sort_title,
       songs.disc_number,
@@ -158,6 +167,11 @@ function addGenre(name) {
 };
 
 function addAlbum(album) {
+ 
+  // =========================
+  // CHECK IF ALBUM EXISTS
+  // =========================
+
   const existing = db.prepare(`
     SELECT id
     FROM albums
@@ -168,9 +182,54 @@ function addAlbum(album) {
     album.artistId
   );
 
+
+  // =========================
+  // UPDATE EXISTING ALBUM
+  // =========================
+
   if (existing) {
+
+    db.prepare(`
+      UPDATE albums
+      SET
+        sort_title = COALESCE(?, sort_title),
+        genre_id = COALESCE(?, genre_id),
+        album_artist = COALESCE(?, album_artist),
+        artwork_path = COALESCE(?, artwork_path),
+        release_date = COALESCE(?, release_date),
+        release_year = COALESCE(?, release_year),
+        total_tracks = COALESCE(?, total_tracks),
+        disc_count = COALESCE(?, disc_count),
+        record_label = COALESCE(?, record_label),
+        copyright = COALESCE(?, copyright),
+        musicbrainz_id = COALESCE(?, musicbrainz_id),
+        updated_at = CURRENT_TIMESTAMP
+
+      WHERE id = ?
+    `).run(
+
+      album.sortTitle,
+      album.genreId,
+      album.albumArtist,
+      album.artworkPath,
+      album.releaseDate,
+      album.releaseYear,
+      album.totalTracks,
+      album.discCount,
+      album.recordLabel,
+      album.copyright,
+      album.musicbrainzId,
+
+      existing.id
+    );
+
     return existing.id;
   }
+
+
+  // =========================
+  // CREATE NEW ALBUM
+  // =========================
 
   const result = db.prepare(`
     INSERT INTO albums (
@@ -188,22 +247,26 @@ function addAlbum(album) {
       copyright,
       musicbrainz_id
     )
+
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
   `).run(
+
     album.title,
-    album.sortTitle,
-    album.artistId,
-    album.genreId,
-    album.albumArtist,
-    album.artworkPath,
-    album.releaseDate,
-    album.releaseYear,
-    album.totalTracks,
-    album.discCount,
-    album.recordLabel,
-    album.copyright,
-    album.musicbrainzId
+  album.sortTitle || album.title,
+  album.artistId || null,
+  album.genreId || null,
+  album.albumArtist || null,
+  album.artworkPath || null,
+  album.releaseDate || null,
+  album.releaseYear || null,
+  album.totalTracks || null,
+  album.discCount || null,
+  album.recordLabel || null,
+  album.copyright || null,
+  album.musicbrainzId || null
   );
+
 
   return result.lastInsertRowid;
 };
@@ -352,17 +415,26 @@ function addFolder(folderPath, name) {
   return result.lastInsertRowid;
 };
 
-
+function getLibrary() {
+  return {
+    albums: getAlbums(),
+    artists: getArtists(),
+    songs: getSongs(),
+    genres: getGenres(),
+    playlists: getPlaylists()
+  };
+}
 
 module.exports = {
   db,
+  getLibrary,
   getAlbums,
   getArtists,
   getSongs,
   getGenres,
   getPlaylists,
 
-  addArtist,
+  addArtist, 
   addGenre,
   addAlbum,
   addSong,
