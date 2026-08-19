@@ -48,6 +48,18 @@ function getArtists() {
   `).all();
 }
 
+function getArtist(id) {
+  return db.prepare(`
+    SELECT
+      artists.id,
+      artists.name,
+      artists.sort_name,
+      artists.artwork_path
+    FROM artists
+    WHERE artists.id = ?
+  `).get(id);
+}
+
 
 // =========================
 // SONGS
@@ -430,11 +442,57 @@ function getLibrary() {
   };
 }
 
+function updateAlbumArtwork(albumId, artworkPath) {
+
+  if (!artworkPath) {
+    return;
+  }
+
+  db.prepare(`
+    UPDATE albums
+    SET
+      artwork_path = ?,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(
+    artworkPath,
+    albumId
+  );
+}
+
+function updateArtistArtwork(artistId, artworkPath) {
+
+  db.prepare(`
+    UPDATE artists
+    SET artwork_path = ?,
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(
+    artworkPath,
+    artistId
+  );
+
+}
+
+function getArtistsWithoutArtwork() {
+  return db.prepare(`
+    SELECT
+      id,
+      name,
+      artwork_path
+    FROM artists
+    WHERE artwork_path IS NULL
+       OR artwork_path = ''
+    ORDER BY name
+  `).all();
+}
+
 module.exports = {
   db,
   getLibrary,
   getAlbums,
   getArtists,
+  getArtist,
   getSongs,
   getGenres,
   getPlaylists,
@@ -443,5 +501,8 @@ module.exports = {
   addGenre,
   addAlbum,
   addSong,
-  addFolder
+  addFolder,
+  updateAlbumArtwork,
+  updateArtistArtwork,
+  getArtistsWithoutArtwork
 };

@@ -20,14 +20,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 let selectedGenreId = null;
 let selectedPlaylistId = null;
 
-function getArtwork(path, fallback) {
-
-  if (!path) {
-    return fallback;
-  }
-
-  return `file://${path.replace(/\\/g, '/')}`;
-}
   
   async function loadLibrary() {
     
@@ -319,6 +311,105 @@ function renderArtistMusic() {
 }
 
 
+function renderSelectedAlbum(albumId) {
+
+  const album = library.albums.find(
+    album => album.id === albumId
+  );
+
+  if (!album) {
+    return;
+  }
+
+  document
+    .querySelectorAll('.musicbox')
+    .forEach(box => {
+      box.classList.remove('active');
+    });
+
+  const selectedAlbum =
+    document.querySelector(
+      `.musicbox[data-album-id="${albumId}"]`
+    );
+
+  if (selectedAlbum) {
+    selectedAlbum.classList.add('active');
+  }
+
+  const songs = library.songs.filter(
+    song => song.album_id === albumId
+  );
+
+  document.getElementById('selectedAlbumArt').src =
+    album.artwork_path || './icons/album.png';
+
+  document.getElementById('selectedAlbumName').textContent =
+    album.title || 'Unknown Album';
+
+  document.getElementById('SelectedArtistsName').textContent =
+    album.artist || 'Unknown Artist';
+
+  const albumInfo = document.getElementById('selectedAlbumInfo');
+
+  albumInfo.querySelectorAll('.dynamicAlbumInfo').forEach(
+    element => element.remove()
+  );
+
+  const year = document.createElement('p');
+
+  year.className = 'dynamicAlbumInfo';
+
+  year.textContent =
+    album.release_year || '';
+
+  albumInfo.appendChild(year);
+
+
+  const genre = document.createElement('p');
+
+  genre.className = 'dynamicAlbumInfo';
+
+  genre.textContent =
+    album.genre || '';
+
+  albumInfo.appendChild(genre);
+
+
+  const songList =
+    document.getElementById('songListContainer');
+
+  songList.innerHTML = songs.map((song, index) => `
+
+    <div
+      class="songContainer"
+      data-song-id="${song.id}"
+    >
+
+      <div id="leftSpan">
+
+        <img
+          src="./icons/volume.png"
+          alt=""
+        >
+
+        <p>${song.track_number || index + 1}</p>
+
+        <p>${song.title}</p>
+
+      </div>
+
+      <img
+        src="./icons/favorite.png"
+        alt=""
+      >
+
+    </div>
+
+  `).join('');
+}
+
+
+
 function renderAlbums() {
   const results = document.getElementById('results');
 
@@ -508,9 +599,9 @@ musicTabs.forEach(tab => {
     
     const results = document.getElementById('results');
     
-    results.addEventListener('click', (event) => {
-      
-       // =========================
+   results.addEventListener('click', (event) => {
+
+  // =========================
   // ALBUM CLICK
   // =========================
 
@@ -518,20 +609,15 @@ musicTabs.forEach(tab => {
 
   if (musicClick) {
 
-    const albumId = Number(
-      musicClick.dataset.albumId
-    );
+    const albumId =
+      Number(musicClick.dataset.albumId);
 
-    console.log("Selected album:", albumId);
+    renderSelectedAlbum(albumId);
 
     const trackListBox =
       document.getElementById('trackListContainer');
 
-    if (trackListBox.style.display === 'block') {
-      trackListBox.style.display = 'none';
-    } else {
-      trackListBox.style.display = 'block';
-    }
+    trackListBox.style.display = 'block';
 
     return;
   }
@@ -544,32 +630,30 @@ musicTabs.forEach(tab => {
   const artistClick =
     event.target.closest('.artistBox');
 
-  if (!artistClick) {
+  if (artistClick) {
+
+    selectedArtistId =
+      Number(artistClick.dataset.artistId);
+
+    // Remove active from all artists
+    document
+      .querySelectorAll('.artistBox')
+      .forEach(artist => {
+        artist.classList.remove('active');
+      });
+
+    // Highlight selected artist
+    artistClick.classList.add('active');
+
+    // Only update the music section
+    const artistMusicResults =
+      document.getElementById('artistMusicResults');
+
+    artistMusicResults.innerHTML =
+      renderArtistMusic();
+
     return;
   }
-
-  selectedArtistId =
-    Number(artistClick.dataset.artistId);
-
-
-  // Remove active from all artists
-  document
-    .querySelectorAll('.artistBox')
-    .forEach(artist => {
-      artist.classList.remove('active');
-    });
-
-
-  // Highlight selected artist
-  artistClick.classList.add('active');
-
-
-  // Only update the music section
-  const artistMusicResults =
-    document.getElementById('artistMusicResults');
-
-  artistMusicResults.innerHTML =
-    renderArtistMusic();
 
 
   // =========================
@@ -588,8 +672,6 @@ musicTabs.forEach(tab => {
       "Selected genre:",
       selectedGenreId
     );
-
-    renderGenres();
 
     return;
   }
@@ -612,12 +694,10 @@ musicTabs.forEach(tab => {
       selectedPlaylistId
     );
 
-    renderPlaylists();
-
     return;
   }
-    
-  });
+
+});
   
   await loadLibrary();
   

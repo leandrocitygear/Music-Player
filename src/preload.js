@@ -73,7 +73,12 @@ selectMusicFolder: () =>
       ipcRenderer.invoke(
         'import-folder',
         folderPath
-      )
+      ),
+
+      populateArtistArtwork: () =>
+  ipcRenderer.invoke(
+    "populate-artist-artwork"
+  )
 
       
 });

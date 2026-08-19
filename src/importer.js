@@ -1,13 +1,23 @@
 const fs = require("fs");
 const path = require("path");
 const mm = require("music-metadata");
+const { app } = require("electron");
 
 const {
+  getArtistsWithoutArtwork,
+  getArtists,
+  getArtist,
   addArtist,
   addGenre,
   addAlbum,
-  addSong
+  addSong,
+  updateAlbumArtwork,
+  updateArtistArtwork
 } = require("./queries");
+
+const {
+  downloadArtistArtwork
+} = require("./artistArtwork");
 
 
 const SUPPORTED_EXTENSIONS = [
@@ -26,6 +36,42 @@ function isMusicFile(filePath) {
   const extension = path.extname(filePath).toLowerCase();
 
   return SUPPORTED_EXTENSIONS.includes(extension);
+}
+
+function saveArtwork(pictures, albumId) {
+
+  if (!pictures || pictures.length === 0) {
+    return null;
+  }
+
+  const picture = pictures[0];
+
+  const artworkDir = path.join(
+    app.getPath("userData"),
+    "artwork"
+  );
+
+  fs.mkdirSync(
+    artworkDir,
+    { recursive: true }
+  );
+
+  const extension =
+    picture.format === "image/png"
+      ? ".png"
+      : ".jpg";
+
+  const artworkPath = path.join(
+    artworkDir,
+    `album-${albumId}${extension}`
+  );
+
+  fs.writeFileSync(
+    artworkPath,
+    picture.data
+  );
+
+  return artworkPath;
 }
 
 
@@ -63,6 +109,41 @@ async function importSong(filePath, folderId = null) {
       null
     );
 
+    const artist = getArtist(artistId);
+
+if (!artist.artwork_path) {
+
+  const artworkPath =
+    await downloadArtistArtwork(
+      artistName,
+      artistId
+    );
+
+  if (artworkPath) {
+
+    updateArtistArtwork(
+      artistId,
+      artworkPath
+    );
+
+  }
+}
+
+    const artistArtworkPath =
+  await downloadArtistArtwork(
+    artistName,
+    artistId
+  );
+
+if (artistArtworkPath) {
+
+  updateArtistArtwork(
+    artistId,
+    artistArtworkPath
+  );
+
+}
+
 
     // -------------------------
     // GENRE
@@ -93,46 +174,56 @@ async function importSong(filePath, folderId = null) {
     const albumId = addAlbum({
       title: albumTitle,
 
-      sortTitle:
-        common.albumsort ||
-        albumTitle,
+  sortTitle:
+    common.albumsort ||
+    albumTitle,
 
-      artistId,
+  artistId,
 
-      genreId,
+  genreId,
 
-      albumArtist,
+  albumArtist,
 
-      artworkPath: null,
+  artworkPath: null,
 
-      releaseDate:
-        common.date ||
-        null,
+  releaseDate:
+    common.date ||
+    null,
 
-      releaseYear:
-        common.year ||
-        null,
+  releaseYear:
+    common.year ||
+    null,
 
-      totalTracks:
-        common.track?.of ||
-        null,
+  totalTracks:
+    common.track?.of ||
+    null,
 
-      discCount:
-        common.disk?.of ||
-        null,
+  discCount:
+    common.disk?.of ||
+    null,
 
-      recordLabel:
-        common.label?.[0] ||
-        null,
+  recordLabel:
+    common.label?.[0] ||
+    null,
 
-      copyright:
-        common.copyright ||
-        null,
+  copyright:
+    common.copyright ||
+    null,
 
-      musicbrainzId:
-        common.musicbrainz_albumid ||
-        null
+  musicbrainzId:
+    common.musicbrainz_albumid ||
+    null
     });
+
+    const artworkPath = saveArtwork(
+  common.picture,
+  albumId
+);
+
+updateAlbumArtwork(
+  albumId,
+  artworkPath
+);
 
 
     // -------------------------
@@ -276,6 +367,57 @@ async function importSong(filePath, folderId = null) {
 };
 
 
+async function populateArtistArtwork() {
+
+  const artists = getArtistsWithoutArtwork();
+
+  console.log(
+    `Found ${artists.length} artists without artwork.`
+  );
+
+  for (const artist of artists) {
+
+    try {
+
+      console.log(
+        `Getting artwork for: ${artist.name}`
+      );
+
+      const artworkPath =
+        await downloadArtistArtwork(
+          artist.name,
+          artist.id
+        );
+
+      if (artworkPath) {
+
+        updateArtistArtwork(
+          artist.id,
+          artworkPath
+        );
+
+        console.log(
+          `Artwork saved for ${artist.name}`
+        );
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        `Artwork failed for ${artist.name}:`,
+        error.message
+      );
+
+    }
+  }
+
+  console.log(
+    "Artist artwork population complete."
+  );
+}
+
+
 async function scanFolder(folderPath, folderId = null) {
 
   const entries = fs.readdirSync(
@@ -345,5 +487,6 @@ async function scanFolder(folderPath, folderId = null) {
 module.exports = {
   importSong,
   scanFolder,
-  isMusicFile
+  isMusicFile,
+  populateArtistArtwork
 };

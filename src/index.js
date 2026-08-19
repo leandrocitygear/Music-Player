@@ -19,7 +19,8 @@ const {
 
 const {
   importSong,
-  scanFolder
+  scanFolder,
+  populateArtistArtwork
 } = require('./importer');
 
 
@@ -176,6 +177,20 @@ ipcMain.handle('import-folder', async (event, folderPath) => {
 ipcMain.handle("get-library", () => {
   return getLibrary();
 });
+
+
+ipcMain.handle(
+  "populate-artist-artwork",
+  async () => {
+
+    await populateArtistArtwork();
+
+    return {
+      success: true
+    };
+
+  }
+);
 
 // This method will be called when Electron has finishe
 // initialization and is ready to create browser windo.
