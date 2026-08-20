@@ -549,8 +549,10 @@ bottom: 25px;
   gap: 4px;
   padding: 2px;
   height: 70%;
+  width: 100%;
   overflow-y: auto;
 }
+
 
 #songListContainer::-webkit-scrollbar {
   border: solid white 1px;
@@ -568,24 +570,45 @@ bottom: 25px;
 }
 
 .songContainer {
- border: solid white 1px;
+ border: solid transparent 1px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 2px;
+  padding: 2px 2px;
   margin: 2px;
-
+  
+  
 }
 
 .songContainer:hover {
    background-color: rgba(95, 92, 92, 0.4);
+ border: solid white 1px;
+
+}
+
+.songContainer.active {
+   background-color: rgba(95, 92, 92, 0.4);
+ border: solid white 1px;
+
 }
 
 #leftSpan {
   display: flex;
   flex-direction: row;
+  align-items: center;
+
   gap: 4px;
+   min-width: 0;
+  overflow: hidden;
+}
+
+#leftSpan p:last-child {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  min-width: 0;
 }
 
 #artistWindow {
@@ -677,7 +700,11 @@ bottom: 25px;
   /* display: flex; */
   color: white;
   /* gap: 6px; */
-  margin: 4px;
+  margin: 8px;
+}
+
+.artistAlbumBox .songContainer {
+  margin: 6px;
 }
 
 .artistAlbumImg {
@@ -687,7 +714,7 @@ bottom: 25px;
 }
 
 .artistAlbumInfo {
-  /* border: solid 1px white; */
+  border: solid 1px white;
   margin: 2px;
 }
 
@@ -797,7 +824,7 @@ bottom: 25px;
 }
 
 .genreBox {
-  border: solid white 1px;
+  border: solid transparent 1px;
   width: 100%;
   height: fit-content;
   padding: 2px;
@@ -810,6 +837,12 @@ bottom: 25px;
 
 .genreBox:hover{
   background-color: rgba(95, 92, 92, 0.4);
+  border: solid white 1px;
+}
+
+.genreBox.active {
+  background-color: rgba(95, 92, 92, 0.4);
+  border: solid white 1px;
 }
 
 #genreMusicResults {

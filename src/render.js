@@ -417,7 +417,7 @@ function renderAlbums() {
     <div id="albumWindow">
     ${library.albums.map(album => `
       <div class="musicbox" data-album-id="${album.id}" >
-     <img class="art" src="${album.artwork_path}" />
+     <img class="art" src="${album.artwork_path || "./b.jpg"}" />
      <p class="alb">${album.title}</p>
      <p class="artistsName">${album.artist || 'Unknown Artist'}</p>
     </div>
@@ -434,7 +434,7 @@ function renderArtists() {
   <div id=artistList>
   ${library.artists.map(artist => `
     <div class="artistBox ${artist.id === selectedArtistId ? 'active' : ''}" data-artist-id="${artist.id}" >
-      <img class="artistImg" src="${artist.artwork_path}" />
+      <img class="artistImg" src="${artist.artwork_path || "./b.jpg" }" />
       <p class="artistName">${artist.name}</p>
     </div>
     `).join("")}
@@ -467,7 +467,7 @@ function renderSongs() {
             <div class="coverColumn">
               <img
                 class="songImg"
-                src="${song.artwork_path}"
+                src="${song.artwork_path || "./b.jpg"}"
               />
             </div>
 
