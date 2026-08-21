@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('node:path');
 const db = require("./database");
+const decoder = require("@audio/decode-aac").default;
 
 const {
   getLibrary,
@@ -9,6 +10,7 @@ const {
   getSongs,
   getGenres,
   getPlaylists,
+  getSong,
 
   addArtist,
   addGenre,
@@ -192,6 +194,36 @@ ipcMain.handle(
   }
 );
 
+ipcMain.handle('get-song', (event, songId) => {
+  return getSong(songId);
+});
+
+
+ipcMain.handle('decode-alac', async (event, filePath) => {
+  try {
+
+   console.log("Decoding ALAC:", filePath);
+
+    const fs = require('node:fs/promises');
+
+    const fileBuffer = await fs.readFile(filePath);
+
+    const decoded = await decoder(fileBuffer);
+
+    console.log("ALAC decoded successfully");
+
+    return {
+      channelData: decoded.channelData,
+      sampleRate: decoded.sampleRate
+    };
+
+  } catch (error) {
+
+    console.error("ALAC decoding failed:", error);
+
+    throw error;
+  }
+});
 // This method will be called when Electron has finishe
 // initialization and is ready to create browser windo.
 // Some APIs can only be used after this event occurs.

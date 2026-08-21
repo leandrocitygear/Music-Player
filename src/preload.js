@@ -78,7 +78,18 @@ selectMusicFolder: () =>
       populateArtistArtwork: () =>
   ipcRenderer.invoke(
     "populate-artist-artwork"
-  )
+  ),
 
+  getSong: (songId) =>
+  ipcRenderer.invoke(
+    "get-song",
+    songId
+  ),
+
+  decodeALAC: (filePath) =>
+  ipcRenderer.invoke(
+    'decode-alac',
+    filePath
+  )
       
 });

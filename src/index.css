@@ -114,7 +114,7 @@ html, #body {
   /* border: solid; */
 }
 
-#likeButton {
+.likeButton {
   position: absolute;
   left: 180px;
   bottom: 10px;
@@ -122,9 +122,8 @@ html, #body {
   height: 20px;
 }
 
-#likeButton:hover{
+.likeButton:hover{
   border: solid 1px white;
-  transform: scale(0.9);
 }
 
 .musicProgres {
@@ -143,12 +142,14 @@ margin-bottom: 5px;
 .timer {
 position: absolute;
 bottom: 25px;
+font-size: 12px;
 }
 
 .duration {
   position: absolute;
   bottom: 25px;
   right: 0;
+font-size: 12px;
 }
 
 #myProgress {
@@ -156,13 +157,33 @@ bottom: 25px;
   margin-right: 3px;
   width: 260px;
    background-color: #d9d9f2; 
-  cursor: pointer;
+  /* cursor: pointer; */
+  position: relative;
 }
 
 #myBar {
   width: 0%;
   height: 2.5px;
   background-color: #ffc266;
+  position: absolute;
+  left: 0;
+
+  top: 3.75px;
+}
+
+#progressHandle {
+  position: absolute;
+  width: 4px;
+  height: 10px;
+
+  right: -2px;
+  top: -3.75px;
+  /* border: solid 1px white ; */
+pointer-events: none;
+
+  /* border-radius: 50%; */
+  background-color: white;
+  /* transform: translateX(-50%); */
 }
 
 .musicControls {
@@ -186,7 +207,7 @@ bottom: 25px;
 
 .icons:hover{
   border: solid 1px white ;
-  transform: scale(0.9);
+ 
 }
 
 #settings {
@@ -201,7 +222,6 @@ bottom: 25px;
 
 #settings:hover {
   border: solid 1px white;
-  transform: scale(0.9);
 }
 
 #addBackground {
@@ -577,7 +597,7 @@ bottom: 25px;
   align-items: center;
   padding: 2px 2px;
   margin: 2px;
-  
+  cursor: default;
   
 }
 
@@ -609,6 +629,14 @@ bottom: 25px;
   text-overflow: ellipsis;
 
   min-width: 0;
+}
+
+.songIsFavorite {
+border: solid 1px transparent;
+}
+
+.songIsFavorite:hover {
+border: solid 1px white;
 }
 
 #artistWindow {
@@ -714,8 +742,9 @@ bottom: 25px;
 }
 
 .artistAlbumInfo {
-  border: solid 1px white;
+  /* border: solid 1px white; */
   margin: 2px;
+  padding: 2px;
 }
 
 #songWindow {
@@ -788,6 +817,11 @@ bottom: 25px;
   cursor: pointer;
   border: 1px solid white;
 
+}
+
+.songRow.active {
+background: rgba(255, 255, 255, 0.1);
+ border: solid white 1px;
 }
 
 
@@ -967,4 +1001,12 @@ bottom: 25px;
 
 #addMenu button span {
   width: 20px;
+}
+
+#shuffle.active {
+  border: solid 1px white;
+}
+
+#repeat.active {
+  border: solid 1px white;
 }

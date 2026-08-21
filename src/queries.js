@@ -487,6 +487,14 @@ function getArtistsWithoutArtwork() {
   `).all();
 }
 
+function getSong(id) {
+  return db.prepare(`
+    SELECT *
+    FROM songs
+    WHERE id = ?
+  `).get(id);
+}
+
 module.exports = {
   db,
   getLibrary,
@@ -496,6 +504,7 @@ module.exports = {
   getSongs,
   getGenres,
   getPlaylists,
+  getSong,
 
   addArtist, 
   addGenre,

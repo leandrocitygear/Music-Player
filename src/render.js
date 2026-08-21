@@ -212,6 +212,8 @@ let selectedPlaylistId = null;
       renderPlaylists();
       break;
   }
+
+  updateActiveSong();
 };
 
 
@@ -292,11 +294,11 @@ function renderArtistMusic() {
 
             <p>${index + 1}</p>
 
-            <p>${song.title}</p>
+            <p title="${song.title}">${song.title}</p>
 
           </div>
 
-          <img 
+          <img class="songIsFavorite"
             src="./icons/favorite.png" 
             alt=""
           >
@@ -394,11 +396,12 @@ function renderSelectedAlbum(albumId) {
 
         <p>${song.track_number || index + 1}</p>
 
-        <p>${song.title}</p>
+        <p title="${song.title}">${song.title}</p>
 
       </div>
 
       <img
+       class="songIsFavorite"
         src="./icons/favorite.png"
         alt=""
       >
@@ -488,6 +491,7 @@ function renderSongs() {
 
   </div>
     `
+    updateActiveSong();
 }
 
 function renderGenres() {
@@ -568,10 +572,716 @@ function renderPlaylists() {
     </div>
     </div>
     `
+  }
+  
+  const audio = document.getElementById('myAudio');
+  let currentSong = null;
+  let currentSongIndex = -1;
+  
+  let isShuffle = false;
+  let repeatMode = "off"; // off, all, one
+  const progressBar = document.getElementById("myBar");
+
+  const progress = document.getElementById("myProgress");
+
+  const progressHandle =
+  document.getElementById("progressHandle");
+
+  const songTitle = document.querySelector(".player .title");
+  
+  
+  
+  let currentAudioUrl = null;
+
+function createWavBlob(channelData, sampleRate) {
+
+  const channels = channelData.length;
+  const samples = channelData[0].length;
+
+  const buffer = new ArrayBuffer(
+    44 + samples * channels * 2
+  );
+
+  const view = new DataView(buffer);
+
+
+  function writeString(offset, string) {
+
+    for (let i = 0; i < string.length; i++) {
+
+      view.setUint8(
+        offset + i,
+        string.charCodeAt(i)
+      );
+
+    }
+
+  }
+
+
+  // RIFF
+  writeString(0, "RIFF");
+
+  view.setUint32(
+    4,
+    36 + samples * channels * 2,
+    true
+  );
+
+  writeString(8, "WAVE");
+
+
+  // fmt
+  writeString(12, "fmt ");
+
+  view.setUint32(16, 16, true);
+
+  view.setUint16(20, 1, true);
+
+  view.setUint16(
+    22,
+    channels,
+    true
+  );
+
+  view.setUint32(
+    24,
+    sampleRate,
+    true
+  );
+
+  view.setUint32(
+    28,
+    sampleRate * channels * 2,
+    true
+  );
+
+  view.setUint16(
+    32,
+    channels * 2,
+    true
+  );
+
+  view.setUint16(
+    34,
+    16,
+    true
+  );
+
+
+  // data
+  writeString(36, "data");
+
+  view.setUint32(
+    40,
+    samples * channels * 2,
+    true
+  );
+
+
+  let offset = 44;
+
+
+  for (let i = 0; i < samples; i++) {
+
+    for (let channel = 0; channel < channels; channel++) {
+
+      let sample =
+        channelData[channel][i];
+
+      sample =
+        Math.max(-1, Math.min(1, sample));
+
+
+      const intSample =
+        sample < 0
+          ? sample * 0x8000
+          : sample * 0x7FFF;
+
+
+      view.setInt16(
+        offset,
+        intSample,
+        true
+      );
+
+      offset += 2;
+
+    }
+
+  }
+
+
+  return new Blob(
+    [buffer],
+    { type: "audio/wav" }
+  );
+
 }
 
 
+function updateActiveSong() {
 
+  // Remove active from every song
+  document
+    .querySelectorAll(".songContainer, .songRow")
+    .forEach(song => {
+      song.classList.remove("active");
+    });
+
+
+  if (!currentSong) return;
+
+
+  // Find every instance of this song
+  document
+    .querySelectorAll(
+      `.songContainer[data-song-id="${currentSong.id}"],
+       .songRow[data-song-id="${currentSong.id}"]`
+    )
+    .forEach(song => {
+
+      song.classList.add("active");
+
+    });
+
+}
+
+
+async function playSong(song) {
+
+  if (!song) return;
+
+
+  currentSong = song;
+
+
+  currentSongIndex =
+    library.songs.findIndex(
+      s => s.id === song.id
+    );
+
+
+  console.log(
+    "Playing:",
+    song.title
+  );
+
+
+  // Update active UI immediately
+  updateActiveSong();
+
+
+  // Update player information
+
+  document.querySelector(".songName").textContent =
+    song.title || "";
+
+  document.querySelector(".artName").textContent =
+    song.artist || "";
+
+  document.querySelector(".albumName").textContent =
+    song.album || "";
+
+
+  document.querySelector(".albumArt").src =
+    song.artwork_path || "./icons/album.png";
+
+const artworkPath =
+  song.artwork_path || './icons/album.png';
+
+if (artworkPath.startsWith('C:\\') || artworkPath.includes(':\\')) {
+
+  document.getElementById('background').style.backgroundImage =
+    `url("file:///${artworkPath.replace(/\\/g, '/')}")`;
+
+} else {
+
+  document.getElementById('background').style.backgroundImage =
+    `url("${artworkPath}")`;
+
+}
+
+
+  // =========================
+  // ALAC
+  // =========================
+
+  if (song.codec === "ALAC") {
+
+    console.log("Decoding ALAC...");
+
+
+    try {
+
+      const decoded =
+        await window.electronAPI.decodeALAC(
+          song.file_path
+        );
+
+
+      const wavBlob =
+        createWavBlob(
+          decoded.channelData,
+          decoded.sampleRate
+        );
+
+
+      if (currentAudioUrl) {
+
+        URL.revokeObjectURL(
+          currentAudioUrl
+        );
+
+      }
+
+
+      currentAudioUrl =
+        URL.createObjectURL(
+          wavBlob
+        );
+
+
+      audio.src =
+        currentAudioUrl;
+
+
+    } catch (error) {
+
+      console.error(
+        "ALAC playback failed:",
+        error
+      );
+
+      return;
+    }
+
+  }
+
+  // =========================
+  // NORMAL AUDIO
+  // =========================
+
+  else {
+
+    audio.src =
+      song.file_path;
+
+  }
+
+
+  audio.load();
+
+
+  try {
+
+    await audio.play();
+
+    updatePlayButton();
+
+  } catch (error) {
+    
+    console.error(
+      "Playback failed:",
+      error
+    );
+
+  }
+
+}
+
+
+const playButton =
+  document.getElementById("play");
+
+
+playButton.addEventListener("click", async () => {
+
+  if (!currentSong) return;
+
+
+  if (audio.paused) {
+
+    await audio.play();
+
+  } else {
+
+    audio.pause();
+
+  }
+
+
+  updatePlayButton();
+
+});
+
+function updatePlayButton() {
+
+  const img =
+    document.querySelector("#play img");
+
+  if (!img) return;
+
+
+  if (audio.paused) {
+
+    img.src =
+      "./icons/play.png";
+
+  } else {
+
+    img.src =
+      "./icons/pause.png";
+
+  }
+
+}
+
+document
+  .getElementById("skip_previous")
+  .addEventListener("click", () => {
+
+    playPreviousSong();
+
+  });
+
+  function playPreviousSong() {
+
+  if (!library.songs.length) return;
+
+
+  let index;
+
+
+  if (isShuffle) {
+
+    index =
+      Math.floor(
+        Math.random() *
+        library.songs.length
+      );
+
+  } else {
+
+    index =
+      currentSongIndex - 1;
+
+
+    if (index < 0) {
+
+      index =
+        library.songs.length - 1;
+
+    }
+
+  }
+
+
+  playSong(
+    library.songs[index]
+  );
+
+}
+
+document
+  .getElementById("skip_next")
+  .addEventListener("click", () => {
+
+    playNextSong();
+
+  });
+
+  function playNextSong() {
+
+  if (!library.songs.length) return;
+
+
+  // Repeat ONE
+  if (
+    repeatMode === "one" &&
+    currentSong
+  ) {
+
+    audio.currentTime = 0;
+
+    audio.play();
+
+    return;
+
+  }
+
+
+  let index;
+
+
+  // Shuffle
+  if (isShuffle) {
+
+    index =
+      Math.floor(
+        Math.random() *
+        library.songs.length
+      );
+
+  }
+
+  // Normal
+  else {
+
+    index =
+      currentSongIndex + 1;
+
+
+    // Repeat ALL
+    if (
+      index >= library.songs.length
+    ) {
+
+      if (repeatMode === "all") {
+
+        index = 0;
+
+      } else {
+
+        audio.pause();
+
+        return;
+
+      }
+
+    }
+
+  }
+
+
+  playSong(
+    library.songs[index]
+  );
+
+}
+
+
+audio.addEventListener(
+  "ended",
+  () => {
+
+    if (repeatMode === "one") {
+
+      audio.currentTime = 0;
+
+      audio.play();
+
+      return;
+
+    }
+
+
+    playNextSong();
+
+  }
+);
+
+document
+  .getElementById("shuffle")
+  .addEventListener("click", () => {
+
+    isShuffle =
+      !isShuffle;
+
+
+    document
+      .getElementById("shuffle")
+      .classList.toggle(
+        "active",
+        isShuffle
+      );
+
+
+    console.log(
+      "Shuffle:",
+      isShuffle
+    );
+
+  });
+
+  document
+  .getElementById("repeat")
+  .addEventListener("click", () => {
+
+    if (repeatMode === "off") {
+
+      repeatMode = "all";
+
+    } else if (repeatMode === "all") {
+
+      repeatMode = "one";
+
+    } else {
+
+      repeatMode = "off";
+
+    }
+
+    const repeatButton =
+      document.getElementById("repeat");
+
+    const repeatIcon =
+      repeatButton.querySelector("img");
+
+
+    // Change icon
+    if (repeatMode === "one") {
+
+      repeatIcon.src = "./icons/repeat1.png";
+
+    } else {
+
+      repeatIcon.src = "./icons/repeat.png";
+
+    }
+
+
+    // Active when repeat is enabled
+    repeatButton.classList.toggle(
+      "active",
+      repeatMode !== "off"
+    );
+
+
+    console.log(
+      "Repeat:",
+      repeatMode
+    );
+
+
+
+
+  });
+
+
+  audio.addEventListener("timeupdate", () => {
+
+  if (!audio.duration) return;
+
+  const progress =
+    (audio.currentTime / audio.duration) * 100;
+
+  progressBar.style.width = `${progress}%`;
+
+  //  progressHandle.style.left =
+  //   `${progress}%`;
+
+});
+
+document
+  .getElementById("myProgress")
+  .addEventListener("click", (event) => {
+
+    if (!audio.duration) return;
+
+    const progress = event.currentTarget;
+
+    const rect = progress.getBoundingClientRect();
+
+    const clickPosition =
+      event.clientX - rect.left;
+
+    const percentage =
+      clickPosition / rect.width;
+
+    audio.currentTime =
+      percentage * audio.duration;
+
+  });
+
+
+  const timer =
+  document.querySelector(".timer");
+
+const duration =
+  document.querySelector(".duration");
+
+function formatTime(seconds) {
+
+  if (!Number.isFinite(seconds)) {
+    return "00:00";
+  }
+
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const secs =
+    Math.floor(seconds % 60);
+
+  return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+audio.addEventListener("timeupdate", () => {
+
+  timer.textContent =
+    formatTime(audio.currentTime);
+
+});
+
+audio.addEventListener("loadedmetadata", () => {
+
+  duration.textContent =
+    formatTime(audio.duration);
+
+});
+
+
+progress.addEventListener("mousedown", (event) => {
+
+  if (!audio.duration) return;
+
+  const updateProgress = (event) => {
+
+    const rect = progress.getBoundingClientRect();
+
+    let percentage =
+      (event.clientX - rect.left) / rect.width;
+
+    percentage =
+      Math.max(0, Math.min(1, percentage));
+
+    audio.currentTime =
+      percentage * audio.duration;
+
+    progressBar.style.width =
+      `${percentage * 100}%`;
+  };
+
+  updateProgress(event);
+
+  const drag = (event) => {
+    updateProgress(event);
+  };
+
+  const stopDrag = () => {
+
+    document.removeEventListener(
+      "mousemove",
+      drag
+    );
+
+    document.removeEventListener(
+      "mouseup",
+      stopDrag
+    );
+  };
+
+  document.addEventListener(
+    "mousemove",
+    drag
+  );
+
+  document.addEventListener(
+    "mouseup",
+    stopDrag
+  );
+
+});
 
 
 
@@ -591,6 +1301,9 @@ musicTabs.forEach(tab => {
   });
 });
 
+
+
+
  // Albums is the default tab
   document
     .getElementById("albums")
@@ -598,8 +1311,9 @@ musicTabs.forEach(tab => {
 
     
     const results = document.getElementById('results');
+
     
-   results.addEventListener('click', (event) => {
+   document.addEventListener('click', async (event) => {
 
   // =========================
   // ALBUM CLICK
@@ -613,6 +1327,7 @@ musicTabs.forEach(tab => {
       Number(musicClick.dataset.albumId);
 
     renderSelectedAlbum(albumId);
+    updateActiveSong();
 
     const trackListBox =
       document.getElementById('trackListContainer');
@@ -651,6 +1366,7 @@ musicTabs.forEach(tab => {
 
     artistMusicResults.innerHTML =
       renderArtistMusic();
+      updateActiveSong();
 
     return;
   }
@@ -696,6 +1412,38 @@ musicTabs.forEach(tab => {
 
     return;
   }
+
+const songElement =
+    event.target.closest(".songContainer, .songRow");
+
+ if (!songElement) return;
+
+
+const songId =
+  songElement.dataset.songId;
+
+
+const song =
+  library.songs.find(
+    song => String(song.id) === String(songId)
+  );
+
+
+if (!song) {
+
+  console.error(
+    "Song not found:",
+    songId
+  );
+
+  return;
+}
+songTitle.textContent = song.title;
+
+
+await playSong(song);
+
+
 
 });
   

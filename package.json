@@ -30,6 +30,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@audio/decode-aac": "^1.4.0",
     "better-sqlite3": "^13.0.3",
     "electron-squirrel-startup": "^1.0.0",
     "jsmediatags": "^1.1.0",
