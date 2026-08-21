@@ -163,26 +163,56 @@ let selectedPlaylistId = null;
         
       }
       
+      const musicMenu = document.getElementById('menu');
+      const navigation = document.getElementById('navigation');
       
-      document.getElementById('menu').addEventListener('click', () => {
-        const nav = document.getElementById('navigation');
-        if (nav.style.display === "block") {
-          nav.style.display = 'none';
+      musicMenu.addEventListener('click', (event) => {
+        
+        event.stopPropagation();
+
+        if (navigation.style.display === "block") {
+          navigation.style.display = 'none';
         } else {
-          nav.style.display = 'block';
+          navigation.style.display = 'block';
         }
       });
 
+     document.addEventListener('click', (event) => {
+
+  // Click was inside the menu or navigation
+  if (
+    musicMenu.contains(event.target) ||
+    navigation.contains(event.target)
+  ) {
+    return;
+  }
+
+  navigation.style.display = "none";
+
+});
+
       
+      const nowPlaying = document.querySelector('.nowPlaying');
+const queue = document.getElementById('queue');
       
-      document.querySelector('.nowPlaying').addEventListener('click', () => {
-        const queue = document.getElementById('queue');
+      nowPlaying.addEventListener('click', (event) => {
+
+        event.stopPropagation();
+
         if (queue.style.display === 'block') {
           queue.style.display = 'none';
         } else {
           queue.style.display = 'block';
         }
       });
+
+      queue.addEventListener('click', (event) => {
+        event.stopPropagation();
+      })
+
+      document.addEventListener('click', () => {
+        queue.style.display = 'none';
+      })
       
       
       
@@ -1213,7 +1243,7 @@ function formatTime(seconds) {
   const secs =
     Math.floor(seconds % 60);
 
-  return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  return `${String(minutes).padStart(1, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
 audio.addEventListener("timeupdate", () => {
