@@ -318,7 +318,7 @@ function renderArtistMusic() {
           <div id="leftSpan">
 
             <img 
-              src="./icons/volume.png" 
+              src="./icons/play.png" 
               alt=""
             >
 
@@ -420,7 +420,7 @@ function renderSelectedAlbum(albumId) {
       <div id="leftSpan">
 
         <img
-          src="./icons/volume.png"
+          src="./icons/play.png"
           alt=""
         >
 
@@ -757,6 +757,14 @@ function updateActiveSong() {
     .querySelectorAll(".songContainer, .songRow")
     .forEach(song => {
       song.classList.remove("active");
+
+      const icon =
+        song.querySelector(".songStatusIcon");
+
+      if (icon) {
+        icon.src = "./icons/play.png";
+      }
+
     });
 
 
@@ -772,6 +780,13 @@ function updateActiveSong() {
     .forEach(song => {
 
       song.classList.add("active");
+
+      const icon =
+        song.querySelector(".songStatusIcon");
+
+      if (icon) {
+        icon.src = "./icons/volume.png";
+      }
 
     });
 
