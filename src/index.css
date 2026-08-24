@@ -1013,9 +1013,12 @@ background: rgba(255, 255, 255, 0.1);
 
 .songStatusIcon {
   border: solid 1px transparent;
-  
 }
 
-.songContainer.active:hover .songStatusIcon {
-  content: url("./icons/pause.png");
+.songStatusIcon:hover {
+  border: solid 1px white;
+}
+
+.songContainer.active .songStatusIcon:hover {
+  border: solid 1px white;
 }

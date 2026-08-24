@@ -318,6 +318,7 @@ function renderArtistMusic() {
           <div id="leftSpan">
 
             <img 
+              class="songStatusIcon"
               src="./icons/play.png" 
               alt=""
             >
@@ -420,6 +421,7 @@ function renderSelectedAlbum(albumId) {
       <div id="leftSpan">
 
         <img
+          class="songStatusIcon"
           src="./icons/play.png"
           alt=""
         >
@@ -602,7 +604,7 @@ function renderPlaylists() {
     </div>
     </div>
     `
-  }
+  };
   
   const audio = document.getElementById('myAudio');
   let currentSong = null;
@@ -774,8 +776,7 @@ function updateActiveSong() {
   // Find every instance of this song
   document
     .querySelectorAll(
-      `.songContainer[data-song-id="${currentSong.id}"],
-       .songRow[data-song-id="${currentSong.id}"]`
+      `[data-song-id="${currentSong.id}"]`
     )
     .forEach(song => {
 
@@ -785,7 +786,11 @@ function updateActiveSong() {
         song.querySelector(".songStatusIcon");
 
       if (icon) {
-        icon.src = "./icons/volume.png";
+        if (audio.paused) {
+          icon.src = "./icons/play.png";
+        } else {
+          icon.src = "./icons/pause.png";
+        }
       }
 
     });
@@ -1125,6 +1130,26 @@ audio.addEventListener(
 
   }
 );
+
+audio.addEventListener("play", () => {
+
+  updateActiveSong();
+
+});
+
+
+audio.addEventListener("pause", () => {
+
+  updateActiveSong();
+
+});
+
+
+audio.addEventListener("ended", () => {
+
+  updateActiveSong();
+
+});
 
 document
   .getElementById("shuffle")
@@ -1467,6 +1492,26 @@ const songElement =
 const songId =
   songElement.dataset.songId;
 
+  if (
+  currentSong &&
+  String(currentSong.id) === String(songId)
+) {
+
+  if (audio.paused) {
+
+    await audio.play();
+
+  } else {
+
+    audio.pause();
+
+  }
+
+  updatePlayButton();
+
+  return;
+}
+
 
 const song =
   library.songs.find(
@@ -1483,7 +1528,7 @@ if (!song) {
 
   return;
 }
-songTitle.textContent = song.title;
+// songTitle.textContent = song.title;
 
 
 await playSong(song);
