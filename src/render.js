@@ -20,6 +20,28 @@ document.addEventListener("DOMContentLoaded", async () => {
 let selectedGenreId = null;
 let selectedPlaylistId = null;
 
+const audio = document.getElementById('myAudio');
+  let currentSong = null;
+  let currentSongIndex = -1;
+  
+  let isShuffle = false;
+  let repeatMode = "off"; // off, all, one
+  const progressBar = document.getElementById("myBar");
+
+  const progress = document.getElementById("myProgress");
+
+  const progressHandle =
+  document.getElementById("progressHandle");
+
+  const songTitle = document.querySelector(".player .title");
+  
+  
+  
+  let currentAudioUrl = null;
+
+  let queueSongs = [];
+let queueIndex = -1;
+
   
   async function loadLibrary() {
     
@@ -567,63 +589,185 @@ function renderGenres() {
     `
 };
 
-function renderPlaylists() {
-  const results = document.getElementById('results');
+function renderQueue() {
 
-  results.innerHTML = `
-  
-  <div id="playlistWindow">
-  <div id=playlistList>
-  ${library.playlists.map(playlist => `
-    <div class="playlistBox"
-    data-playlist-id="${playlist.id}">
-      <p class="playlistName">${playlist.name}</p>
-    </div>
-    `).join("")}
-    </div>
-    <div id="playlistMusicResults">
-    
-      <div class="artistAlbumBox">
-      <img class="artistAlbumImg" src=""/>
-      <div class="artistAlbumInfo">
-      <p></p>
-      <p></p>
+  const queueList =
+    document.getElementById("queueList");
+
+  if (!queueList) return;
+
+  if (queueSongs.length === 0) {
+
+    queueList.innerHTML = `
+      <div class="emptyQueue">
+        <p>Your queue is empty</p>
       </div>
-      
-        <div class="songContainer">
-          <div id="leftSpan">
-            <img src="./icons/volume.png" alt="">
-            <p>1</p>
-            <p></p>
-          </div>
-          <img src="./icons/favorite.png" alt="">
+    `;
+
+    return;
+  }
+
+  queueList.innerHTML = queueSongs.map((song, index) => {
+
+    // Check if this is the currently playing song
+    const isActive =
+      currentSong &&
+      String(song.id) === String(currentSong.id);
+
+    return `
+      <div
+        class="queueSong ${isActive ? "active" : ""}"
+        data-queue-index="${index}"
+        data-song-id="${song.id}"
+      >
+
+        <img
+          class="queueArt"
+          src="${song.artwork_path || "./icons/album.png"}"
+          alt=""
+        >
+
+        <div class="queueSongInfo">
+
+          <p class="queueSongTitle">
+            ${song.title || "Unknown Title"}
+          </p>
+
+          <p class="queueAlb">
+            ${song.album || "Unknown Album"}
+          </p>
+
+          <p class="queueArtistsName">
+            ${song.artist || "Unknown Artist"}
+          </p>
+
         </div>
-        
+
+        <div class="queueSongDuration">
+          ${formatTime(song.duration)}
+        </div>
+
       </div>
-      
-    </div>
-    </div>
-    `
-  };
-  
-  const audio = document.getElementById('myAudio');
-  let currentSong = null;
-  let currentSongIndex = -1;
-  
-  let isShuffle = false;
-  let repeatMode = "off"; // off, all, one
-  const progressBar = document.getElementById("myBar");
+    `;
 
-  const progress = document.getElementById("myProgress");
+  }).join("");
+}
 
-  const progressHandle =
-  document.getElementById("progressHandle");
+document
+  .getElementById("queueList")
+  .addEventListener("click", async (event) => {
 
-  const songTitle = document.querySelector(".player .title");
+    event.stopPropagation();
+
+    const queueSong =
+      event.target.closest(".queueSong");
+
+    if (!queueSong) return;
+
+    const index =
+      Number(queueSong.dataset.queueIndex);
+
+    if (
+      index < 0 ||
+      index >= queueSongs.length
+    ) {
+      return;
+    }
+
+    queueIndex = index;
+
+    const song = queueSongs[queueIndex];
+
+    console.log(
+      "Playing queue song:",
+      song.title
+    );
+
+    await playSong(song);
+
+    renderQueue();
+  });
   
-  
-  
-  let currentAudioUrl = null;
+  function addToQueue(song) {
+
+  if (!song) return;
+
+  // Don't add the current song
+  if (currentSong && song.id === currentSong.id) {
+    return;
+  }
+
+  // Don't add duplicates
+  if (queueSongs.some(s => s.id === song.id)) {
+    return;
+  }
+
+  queueSongs.push(song);
+
+  renderQueue();
+
+  console.log("Added to queue:", song.title);
+}
+
+function removeFromQueue(index) {
+  if (index < 0 || index >= queueSongs.length) {
+    return;
+  }
+
+  const removedSong = queueSongs.splice(index, 1)[0];
+
+  renderQueue();
+
+  console.log("Removed from queue:", removedSong.title);
+}
+
+function playQueue(songs, startIndex = 0) {
+
+  if (!songs || songs.length === 0) {
+    return;
+  }
+
+  queueSongs = [...songs];
+
+  queueIndex = startIndex;
+
+  renderQueue();
+
+  playSong(queueSongs[queueIndex]);
+}
+
+function playNextInQueue(song) {
+
+  if (!song) return;
+
+  const insertIndex = queueIndex + 1;
+
+  queueSongs.splice(insertIndex, 0, song);
+
+  renderQueue();
+
+  console.log(
+    "Playing next:",
+    song.title
+  );
+}
+
+function clearQueue() {
+
+  queueSongs = [];
+  queueIndex = -1;
+
+  renderQueue();
+console.log("Queue cleared");
+}
+
+document
+  .getElementById("clearQueue")
+  .addEventListener("click", () => {
+
+    clearQueue();
+
+  });
 
 function createWavBlob(channelData, sampleRate) {
 
@@ -800,29 +944,38 @@ function updateActiveSong() {
 
 async function playSong(song) {
 
+ 
   if (!song) return;
 
-
   currentSong = song;
-
 
   currentSongIndex =
     library.songs.findIndex(
       s => s.id === song.id
     );
 
+  // Find song inside queue
+  const indexInQueue =
+    queueSongs.findIndex(
+      s => s.id === song.id
+    );
+
+  if (indexInQueue !== -1) {
+    queueIndex = indexInQueue;
+  }
+
+  renderQueue();
 
   console.log(
     "Playing:",
     song.title
   );
 
-
-  // Update active UI immediately
   updateActiveSong();
 
-
-  // Update player information
+  // =========================
+  // PLAYER INFO
+  // =========================
 
   document.querySelector(".songName").textContent =
     song.title || "";
@@ -833,24 +986,31 @@ async function playSong(song) {
   document.querySelector(".albumName").textContent =
     song.album || "";
 
-
   document.querySelector(".albumArt").src =
     song.artwork_path || "./icons/album.png";
 
-const artworkPath =
-  song.artwork_path || './icons/album.png';
 
-if (artworkPath.startsWith('C:\\') || artworkPath.includes(':\\')) {
+  // =========================
+  // BACKGROUND
+  // =========================
 
-  document.getElementById('background').style.backgroundImage =
-    `url("file:///${artworkPath.replace(/\\/g, '/')}")`;
+  const artworkPath =
+    song.artwork_path || "./icons/album.png";
 
-} else {
+  if (
+    artworkPath.startsWith("C:\\") ||
+    artworkPath.includes(":\\")
+  ) {
 
-  document.getElementById('background').style.backgroundImage =
-    `url("${artworkPath}")`;
+    document.getElementById("background").style.backgroundImage =
+      `url("file:///${artworkPath.replace(/\\/g, "/")}")`;
 
-}
+  } else {
+
+    document.getElementById("background").style.backgroundImage =
+      `url("${artworkPath}")`;
+
+  }
 
 
   // =========================
@@ -861,7 +1021,6 @@ if (artworkPath.startsWith('C:\\') || artworkPath.includes(':\\')) {
 
     console.log("Decoding ALAC...");
 
-
     try {
 
       const decoded =
@@ -869,13 +1028,11 @@ if (artworkPath.startsWith('C:\\') || artworkPath.includes(':\\')) {
           song.file_path
         );
 
-
       const wavBlob =
         createWavBlob(
           decoded.channelData,
           decoded.sampleRate
         );
-
 
       if (currentAudioUrl) {
 
@@ -885,16 +1042,13 @@ if (artworkPath.startsWith('C:\\') || artworkPath.includes(':\\')) {
 
       }
 
-
       currentAudioUrl =
         URL.createObjectURL(
           wavBlob
         );
 
-
       audio.src =
         currentAudioUrl;
-
 
     } catch (error) {
 
@@ -928,9 +1082,10 @@ if (artworkPath.startsWith('C:\\') || artworkPath.includes(':\\')) {
     await audio.play();
 
     updatePlayButton();
+    updateActiveSong();
 
   } catch (error) {
-    
+
     console.error(
       "Playback failed:",
       error
@@ -987,6 +1142,39 @@ function updatePlayButton() {
 
 }
 
+function playLibraryPreviousSong() {
+
+  if (!library.songs.length) return;
+
+  let index;
+
+  if (isShuffle) {
+
+    index = Math.floor(
+      Math.random() * library.songs.length
+    );
+
+  } else {
+
+    index = currentSongIndex - 1;
+
+    if (index < 0) {
+
+      if (repeatMode === "all") {
+
+        index =
+          library.songs.length - 1;
+
+      } else {
+
+        index = 0;
+      }
+    }
+  }
+
+  playSong(library.songs[index]);
+}
+
 document
   .getElementById("skip_previous")
   .addEventListener("click", () => {
@@ -997,40 +1185,94 @@ document
 
   function playPreviousSong() {
 
-  if (!library.songs.length) return;
+  if (!currentSong) return;
 
 
-  let index;
+  // If no queue, use library
+  if (queueSongs.length === 0) {
+
+    playLibraryPreviousSong();
+
+    return;
+  }
+
+
+  let previousIndex;
 
 
   if (isShuffle) {
 
-    index =
+    previousIndex =
       Math.floor(
-        Math.random() *
-        library.songs.length
+        Math.random() * queueSongs.length
       );
 
   } else {
 
-    index =
-      currentSongIndex - 1;
+    previousIndex =
+      queueIndex - 1;
+
+  }
 
 
-    if (index < 0) {
+  if (previousIndex < 0) {
 
-      index =
-        library.songs.length - 1;
+    if (repeatMode === "all") {
+
+      previousIndex =
+        queueSongs.length - 1;
+
+    } else {
+
+      previousIndex = 0;
 
     }
 
   }
 
 
+  queueIndex = previousIndex;
+
+  renderQueue();
+
   playSong(
-    library.songs[index]
+    queueSongs[queueIndex]
   );
 
+}
+
+function playLibraryNextSong() {
+
+  if (!library.songs.length) return;
+
+  let index;
+
+  if (isShuffle) {
+
+    index = Math.floor(
+      Math.random() * library.songs.length
+    );
+
+  } else {
+
+    index = currentSongIndex + 1;
+
+    if (index >= library.songs.length) {
+
+      if (repeatMode === "all") {
+
+        index = 0;
+
+      } else {
+
+        audio.pause();
+
+        return;
+      }
+    }
+  }
+
+  playSong(library.songs[index]);
 }
 
 document
@@ -1042,70 +1284,87 @@ document
   });
 
   function playNextSong() {
+  if (!currentSong) return;
 
-  if (!library.songs.length) return;
+  // =========================
+  // REPEAT ONE
+  // =========================
 
-
-  // Repeat ONE
-  if (
-    repeatMode === "one" &&
-    currentSong
-  ) {
+  if (repeatMode === "one") {
 
     audio.currentTime = 0;
 
     audio.play();
 
     return;
-
   }
 
 
-  let index;
+  // =========================
+  // NO QUEUE
+  // =========================
+
+  if (queueSongs.length === 0) {
+
+    playLibraryNextSong();
+
+    return;
+  }
 
 
-  // Shuffle
+  // =========================
+  // NEXT QUEUE SONG
+  // =========================
+
+  let nextIndex;
+
+
   if (isShuffle) {
 
-    index =
+    nextIndex =
       Math.floor(
-        Math.random() *
-        library.songs.length
+        Math.random() * queueSongs.length
       );
 
+  } else {
+
+    nextIndex =
+      queueIndex + 1;
+
   }
 
-  // Normal
-  else {
 
-    index =
-      currentSongIndex + 1;
+  // =========================
+  // END OF QUEUE
+  // =========================
 
+  if (nextIndex >= queueSongs.length) {
 
-    // Repeat ALL
-    if (
-      index >= library.songs.length
-    ) {
+    if (repeatMode === "all") {
 
-      if (repeatMode === "all") {
+      nextIndex = 0;
 
-        index = 0;
+    } else {
 
-      } else {
+      audio.pause();
 
-        audio.pause();
+      queueIndex = queueSongs.length - 1;
 
-        return;
+      renderQueue();
+      updateActiveSong();
+      updatePlayButton();
 
-      }
-
+      return;
     }
-
   }
 
+
+  queueIndex = nextIndex;
+
+  renderQueue();
 
   playSong(
-    library.songs[index]
+    queueSongs[queueIndex]
   );
 
 }
@@ -1134,22 +1393,16 @@ audio.addEventListener(
 audio.addEventListener("play", () => {
 
   updateActiveSong();
-
+updatePlayButton();
 });
 
 
 audio.addEventListener("pause", () => {
 
   updateActiveSong();
-
+updatePlayButton();
 });
 
-
-audio.addEventListener("ended", () => {
-
-  updateActiveSong();
-
-});
 
 document
   .getElementById("shuffle")
@@ -1382,160 +1635,293 @@ musicTabs.forEach(tab => {
     
     const results = document.getElementById('results');
 
-    
-   document.addEventListener('click', async (event) => {
-
-  // =========================
-  // ALBUM CLICK
-  // =========================
-
-  const musicClick = event.target.closest('.musicbox');
-
-  if (musicClick) {
-
-    const albumId =
-      Number(musicClick.dataset.albumId);
-
-    renderSelectedAlbum(albumId);
-    updateActiveSong();
-
-    const trackListBox =
-      document.getElementById('trackListContainer');
-
-    trackListBox.style.display = 'block';
-
-    return;
-  }
-
-
-  // =========================
-  // ARTIST CLICK
-  // =========================
-
-  const artistClick =
-    event.target.closest('.artistBox');
-
-  if (artistClick) {
-
-    selectedArtistId =
-      Number(artistClick.dataset.artistId);
-
-    // Remove active from all artists
     document
-      .querySelectorAll('.artistBox')
-      .forEach(artist => {
-        artist.classList.remove('active');
-      });
+  .getElementById("queueList")
+    
+  document.addEventListener(
+  "click",
+  async (event) => {
 
-    // Highlight selected artist
-    artistClick.classList.add('active');
+    // =========================
+    // ALBUM
+    // =========================
 
-    // Only update the music section
-    const artistMusicResults =
-      document.getElementById('artistMusicResults');
+    const musicClick =
+      event.target.closest(".musicbox");
 
-    artistMusicResults.innerHTML =
-      renderArtistMusic();
+    if (musicClick) {
+
+      const albumId =
+        Number(
+          musicClick.dataset.albumId
+        );
+
+      renderSelectedAlbum(albumId);
+
       updateActiveSong();
 
-    return;
-  }
+      const trackListBox =
+        document.getElementById(
+          "trackListContainer"
+        );
+
+      trackListBox.style.display =
+        "block";
+
+      return;
+    }
 
 
-  // =========================
-  // GENRE CLICK
-  // =========================
+    // =========================
+    // ARTIST
+    // =========================
 
-  const genreClick =
-    event.target.closest('.genreBox');
+    const artistClick =
+      event.target.closest(".artistBox");
 
-  if (genreClick) {
+    if (artistClick) {
 
-    selectedGenreId =
-      Number(genreClick.dataset.genreId);
+      selectedArtistId =
+        Number(
+          artistClick.dataset.artistId
+        );
+
+      document
+        .querySelectorAll(".artistBox")
+        .forEach(artist => {
+
+          artist.classList.remove(
+            "active"
+          );
+
+        });
+
+      artistClick.classList.add(
+        "active"
+      );
+
+      const artistMusicResults =
+        document.getElementById(
+          "artistMusicResults"
+        );
+
+      artistMusicResults.innerHTML =
+        renderArtistMusic();
+
+      updateActiveSong();
+
+      return;
+    }
+
+
+    // =========================
+    // GENRE
+    // =========================
+
+    const genreClick =
+      event.target.closest(".genreBox");
+
+    if (genreClick) {
+
+      selectedGenreId =
+        Number(
+          genreClick.dataset.genreId
+        );
+
+      console.log(
+        "Selected genre:",
+        selectedGenreId
+      );
+
+      return;
+    }
+
+
+    // =========================
+    // PLAYLIST
+    // =========================
+
+    const playlistClick =
+      event.target.closest(
+        ".playlistBox"
+      );
+
+    if (playlistClick) {
+
+      selectedPlaylistId =
+        Number(
+          playlistClick.dataset.playlistId
+        );
+
+      console.log(
+        "Selected playlist:",
+        selectedPlaylistId
+      );
+
+      return;
+    }
+
+
+    // =========================
+    // QUEUE SONG
+    // =========================
+
+    // const queueSong =
+    //   event.target.closest(
+    //     ".queueSong"
+    //   );
+
+    // if (queueSong) {
+
+    //   const queueIndexClicked =
+    //     Number(
+    //       queueSong.dataset.queueIndex
+    //     );
+
+    //   if (
+    //     queueIndexClicked < 0 ||
+    //     queueIndexClicked >= queueSongs.length
+    //   ) {
+    //     return;
+    //   }
+
+    //   queueIndex =
+    //     queueIndexClicked;
+
+    //   renderQueue();
+
+    //   await playSong(
+    //     queueSongs[queueIndex]
+    //   );
+
+    //   return;
+    // }
+
+
+    // =========================
+    // LIBRARY SONG
+    // =========================
+
+    const songElement =
+      event.target.closest(
+        ".songContainer, .songRow"
+      );
+
+    if (!songElement) return;
+
+
+    const songId =
+      songElement.dataset.songId;
+
+
+    const song =
+      library.songs.find(
+        song =>
+          String(song.id) ===
+          String(songId)
+      );
+
+
+    if (!song) {
+
+      console.error(
+        "Song not found:",
+        songId
+      );
+
+      return;
+    }
+
+
+    // =========================
+    // CURRENT SONG
+    // PLAY / PAUSE
+    // =========================
+
+    if (
+      currentSong &&
+      String(currentSong.id) ===
+      String(song.id)
+    ) {
+
+      if (audio.paused) {
+
+        await audio.play();
+
+      } else {
+
+        audio.pause();
+
+      }
+
+      updatePlayButton();
+      updateActiveSong();
+
+      return;
+    }
+
+
+    // =========================
+    // CREATE ALBUM QUEUE
+    // =========================
+
+    const albumSongs =
+      library.songs
+        .filter(
+          s =>
+            s.album_id ===
+            song.album_id
+        )
+        .sort(
+          (a, b) =>
+            (a.track_number || 0) -
+            (b.track_number || 0)
+        );
+
+
+    const clickedIndex =
+      albumSongs.findIndex(
+        s =>
+          String(s.id) ===
+          String(song.id)
+      );
+
+
+    if (clickedIndex === -1) {
+
+      console.error(
+        "Song not found in album:",
+        song.id
+      );
+
+      return;
+    }
+
+
+    // Current song + everything after it
+    queueSongs =
+      albumSongs.slice(
+        clickedIndex
+      );
+
+
+    // Current song is first in queue
+    queueIndex = 0;
+
 
     console.log(
-      "Selected genre:",
-      selectedGenreId
+      "New queue:",
+      queueSongs
     );
 
-    return;
-  }
+
+    renderQueue();
 
 
-  // =========================
-  // PLAYLIST CLICK
-  // =========================
-
-  const playlistClick =
-    event.target.closest('.playlistBox');
-
-  if (playlistClick) {
-
-    selectedPlaylistId =
-      Number(playlistClick.dataset.playlistId);
-
-    console.log(
-      "Selected playlist:",
-      selectedPlaylistId
-    );
-
-    return;
-  }
-
-const songElement =
-    event.target.closest(".songContainer, .songRow");
-
- if (!songElement) return;
-
-
-const songId =
-  songElement.dataset.songId;
-
-  if (
-  currentSong &&
-  String(currentSong.id) === String(songId)
-) {
-
-  if (audio.paused) {
-
-    await audio.play();
-
-  } else {
-
-    audio.pause();
+    await playSong(song);
 
   }
-
-  updatePlayButton();
-
-  return;
-}
-
-
-const song =
-  library.songs.find(
-    song => String(song.id) === String(songId)
-  );
-
-
-if (!song) {
-
-  console.error(
-    "Song not found:",
-    songId
-  );
-
-  return;
-}
-// songTitle.textContent = song.title;
-
-
-await playSong(song);
-
-
-
-});
+);
   
   await loadLibrary();
   
