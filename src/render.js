@@ -1286,6 +1286,9 @@ async function playSong(song) {
   document.querySelector(".songName").textContent =
     song.title || "";
 
+    document.querySelector(".player .title").textContent =
+  song.title || "";
+
   document.querySelector(".artName").textContent =
     song.artist || "";
 
@@ -2119,6 +2122,42 @@ document
     await toggleFavorite(currentSong);
   });
 
+  const volumeButton =
+  document.getElementById("volume");
+
+const volumeSlider =
+  document.getElementById("volumeSlider");
+
+
+// Hide slider initially
+volumeSlider.style.display = "none";
+
+
+// Show / hide slider
+volumeButton.addEventListener("click", (event) => {
+
+  event.stopPropagation();
+
+  if (volumeSlider.style.display === "none") {
+
+    volumeSlider.style.display = "block";
+
+  } else {
+
+    volumeSlider.style.display = "none";
+
+  }
+
+});
+
+
+// Change audio volume
+volumeSlider.addEventListener("input", () => {
+
+  audio.volume =
+    Number(volumeSlider.value);
+
+});
 
 
 const musicTabs = document.querySelectorAll('.musicTabs'); 
@@ -2698,3 +2737,4 @@ function toggleFullscreen() {
 };
 
 isFullscreen.addEventListener('click', toggleFullscreen);
+
