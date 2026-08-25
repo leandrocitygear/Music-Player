@@ -215,7 +215,7 @@ let queueIndex = -1;
 });
 
       
-      const nowPlaying = document.querySelector('.nowPlaying');
+      const nowPlaying = document.querySelector('.albumArt');
 const queue = document.getElementById('queue');
       
       nowPlaying.addEventListener('click', (event) => {
@@ -1277,6 +1277,7 @@ async function playSong(song) {
   );
 
   updateActiveSong();
+  
 
   // =========================
   // PLAYER INFO
@@ -1293,6 +1294,13 @@ async function playSong(song) {
 
   document.querySelector(".albumArt").src =
     song.artwork_path || "./icons/album.png";
+
+  document.querySelector('.likeButton .songIsFavorite').src =
+    isSongFavorite(song)
+      ? "./icons/likefull.png"
+      : "./icons/favorite.png"
+  
+
 
 
   // =========================
@@ -2061,6 +2069,26 @@ async function toggleFavorite(song) {
     library.genres = data.genres;
     library.playlists = data.playlists;
 
+
+    // Get the updated song from the new library
+    const updatedSong =
+      library.songs.find(
+        s => String(s.id) === String(song.id)
+      );
+
+    if (updatedSong) {
+      currentSong = updatedSong;
+    }
+
+    // Update the player favorite icon
+    document.querySelector(
+      '.likeButton .songIsFavorite'
+    ).src =
+      isSongFavorite(currentSong)
+        ? "./icons/likefull.png"
+        : "./icons/favorite.png";
+
+
     // Refresh the current view
     renderCurrentView();
     updateFavoriteIcons();
@@ -2079,6 +2107,17 @@ async function toggleFavorite(song) {
     );
   }
 }
+
+document
+  .querySelector(".likeButton")
+  .addEventListener("click", async (event) => {
+
+    event.stopPropagation();
+
+    if (!currentSong) return;
+
+    await toggleFavorite(currentSong);
+  });
 
 
 

@@ -118,13 +118,10 @@ html, #body {
   position: absolute;
   left: 180px;
   bottom: 10px;
-  border: solid 1px transparent;
+  /* border: solid 1px transparent; */
   height: 20px;
 }
 
-.likeButton:hover{
-  border: solid 1px white;
-}
 
 .musicProgres {
   /* border: solid; */
