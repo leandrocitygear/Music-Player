@@ -17,7 +17,8 @@ const {
   addAlbum,
   addSong,
   addFolder,
-  setSongFavorite
+  setSongFavorite,
+  removeSongFromPlaylist
 } = require("./queries");
 
 const {
@@ -235,6 +236,18 @@ ipcMain.handle(
       songId,
       isFavorite
     );
+  }
+);
+
+ipcMain.handle(
+  "remove-song-from-playlist",
+  (event, playlistId, songId) => {
+
+    return removeSongFromPlaylist(
+      playlistId,
+      songId
+    );
+
   }
 );
 

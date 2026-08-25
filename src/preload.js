@@ -100,6 +100,16 @@ selectMusicFolder: () =>
     "set-song-favorite",
     songId,
     isFavorite
+  ),
+
+  removeSongFromPlaylist: (
+  playlistId,
+  songId
+) =>
+  ipcRenderer.invoke(
+    "remove-song-from-playlist",
+    playlistId,
+    songId
   )
       
 });

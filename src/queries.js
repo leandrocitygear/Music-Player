@@ -566,6 +566,25 @@ function setSongFavorite(songId, isFavorite) {
     }
 }
 
+function removeSongFromPlaylist(
+  playlistId,
+  songId
+) {
+
+  db.prepare(`
+    DELETE FROM playlist_songs
+    WHERE playlist_id = ?
+    AND song_id = ?
+  `).run(
+    playlistId,
+    songId
+  );
+
+  return {
+    success: true
+  };
+}
+
 module.exports = {
   db,
   getLibrary,
@@ -585,5 +604,6 @@ module.exports = {
   updateAlbumArtwork,
   updateArtistArtwork,
   getArtistsWithoutArtwork,
-  setSongFavorite
+  setSongFavorite,
+  removeSongFromPlaylist
 };

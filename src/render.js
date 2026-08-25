@@ -2160,6 +2160,1490 @@ volumeSlider.addEventListener("input", () => {
 });
 
 
+
+
+// =====================================================
+// CONTEXT MENU
+// =====================================================
+
+const contextMenu =
+  document.getElementById("contextMenu");
+
+let contextTarget = null;
+let contextType = null;
+
+
+// =====================================================
+// HIDE CONTEXT MENU
+// =====================================================
+
+function hideContextMenu() {
+
+  contextMenu.style.display = "none";
+
+  contextTarget = null;
+  contextType = null;
+}
+
+
+// =====================================================
+// SHOW CONTEXT MENU
+// =====================================================
+
+function showContextMenu(event, type, target) {
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  contextTarget = target;
+  contextType = type;
+
+  // Hide every menu
+  document
+    .querySelectorAll(".contextSection")
+    .forEach(section => {
+      section.classList.remove("active");
+    });
+
+
+  // Show correct menu
+  const section =
+    document.querySelector(
+      `.contextSection[data-menu="${type}"]`
+    );
+
+  if (!section) return;
+
+  section.classList.add("active");
+
+
+  // ===================================================
+  // SONG FAVORITE TEXT
+  // ===================================================
+
+  if (type === "song") {
+
+    const favoriteText =
+      section.querySelector(".favoriteText");
+
+    if (favoriteText) {
+
+      favoriteText.textContent =
+        isSongFavorite(target)
+          ? "Remove from Favorites"
+          : "Add to Favorites";
+    }
+
+
+    // Remove from playlist only when
+    // currently viewing a playlist
+
+    const removePlaylist =
+      document.getElementById(
+        "removeFromPlaylistItem"
+      );
+
+    if (removePlaylist) {
+
+      removePlaylist.style.display =
+        activeTab === "playlist"
+          ? "flex"
+          : "none";
+    }
+  }
+
+
+  // ===================================================
+  // ALBUM FAVORITE TEXT
+  // ===================================================
+
+  if (type === "album") {
+
+    const albumSongs =
+      library.songs.filter(
+        song =>
+          Number(song.album_id) ===
+          Number(target.id)
+      );
+
+    const allFavorite =
+      albumSongs.length > 0 &&
+      albumSongs.every(
+        song => isSongFavorite(song)
+      );
+
+    const favoriteText =
+      section.querySelector(
+        ".albumFavoriteText"
+      );
+
+    if (favoriteText) {
+
+      favoriteText.textContent =
+        allFavorite
+          ? "Remove All from Favorites"
+          : "Add All to Favorites";
+    }
+  }
+
+
+  // ===================================================
+  // POSITION MENU
+  // ===================================================
+
+  contextMenu.style.display = "block";
+
+
+  let x = event.clientX;
+  let y = event.clientY;
+
+
+  const menuRect =
+    contextMenu.getBoundingClientRect();
+
+
+  // Prevent going outside right side
+  if (
+    x + menuRect.width >
+    window.innerWidth
+  ) {
+
+    x =
+      window.innerWidth -
+      menuRect.width -
+      10;
+  }
+
+
+  // Prevent going outside bottom
+  if (
+    y + menuRect.height >
+    window.innerHeight
+  ) {
+
+    y =
+      window.innerHeight -
+      menuRect.height -
+      10;
+  }
+
+
+  contextMenu.style.left =
+    `${Math.max(5, x)}px`;
+
+  contextMenu.style.top =
+    `${Math.max(5, y)}px`;
+}
+
+
+// =====================================================
+// RIGHT CLICK DETECTION
+// =====================================================
+
+document.addEventListener(
+  "contextmenu",
+  event => {
+
+    // ==========================================
+    // SONG
+    // ==========================================
+
+    const songElement =
+      event.target.closest(
+        ".songContainer, .songRow"
+      );
+
+    if (songElement) {
+
+      const songId =
+        songElement.dataset.songId;
+
+      const song =
+        library.songs.find(
+          s =>
+            String(s.id) ===
+            String(songId)
+        );
+
+      if (!song) return;
+
+      showContextMenu(
+        event,
+        "song",
+        song
+      );
+
+      return;
+    }
+
+
+    // ==========================================
+    // ALBUM
+    // ==========================================
+
+    const albumElement =
+      event.target.closest(
+        ".musicbox"
+      );
+
+    if (albumElement) {
+
+      const albumId =
+        Number(
+          albumElement.dataset.albumId
+        );
+
+      const album =
+        library.albums.find(
+          a =>
+            Number(a.id) ===
+            albumId
+        );
+
+      if (!album) return;
+
+      showContextMenu(
+        event,
+        "album",
+        album
+      );
+
+      return;
+    }
+
+
+    // ==========================================
+    // ARTIST
+    // ==========================================
+
+    const artistElement =
+      event.target.closest(
+        ".artistBox"
+      );
+
+    if (artistElement) {
+
+      const artistId =
+        Number(
+          artistElement.dataset.artistId
+        );
+
+      const artist =
+        library.artists.find(
+          a =>
+            Number(a.id) ===
+            artistId
+        );
+
+      if (!artist) return;
+
+      showContextMenu(
+        event,
+        "artist",
+        artist
+      );
+
+      return;
+    }
+
+
+    // ==========================================
+    // PLAYLIST
+    // ==========================================
+
+    const playlistElement =
+      event.target.closest(
+        ".playlistBox"
+      );
+
+    if (playlistElement) {
+
+      const playlistId =
+        Number(
+          playlistElement.dataset.playlistId
+        );
+
+      const playlist =
+        library.playlists.find(
+          p =>
+            Number(p.id) ===
+            playlistId
+        );
+
+      if (!playlist) return;
+
+      showContextMenu(
+        event,
+        "playlist",
+        playlist
+      );
+
+      return;
+    }
+
+
+    // Nothing recognized
+    hideContextMenu();
+
+  }
+);
+
+document.addEventListener(
+  "click",
+  event => {
+
+    if (
+      !contextMenu.contains(
+        event.target
+      )
+    ) {
+
+      hideContextMenu();
+    }
+
+  }
+);
+
+
+window.addEventListener(
+  "blur",
+  hideContextMenu
+);
+
+
+window.addEventListener(
+  "resize",
+  hideContextMenu
+);
+
+// =====================================================
+// CONTEXT MENU ACTIONS
+// =====================================================
+
+contextMenu.addEventListener(
+  "click",
+  async event => {
+
+    const item =
+      event.target.closest(
+        ".contextItem"
+      );
+
+    if (!item) return;
+
+    const action =
+      item.dataset.action;
+
+    const target =
+      contextTarget;
+
+    hideContextMenu();
+
+    if (!target) return;
+
+
+    // =================================================
+    // SONG
+    // =================================================
+
+    if (action === "play") {
+
+      await playSong(target);
+
+      return;
+    }
+
+
+    if (action === "play-next") {
+
+      playNextSongContext(target);
+
+      return;
+    }
+
+
+    if (action === "add-queue") {
+
+      addToQueue(target);
+
+      return;
+    }
+
+
+    if (action === "favorite") {
+
+      await toggleFavorite(target);
+
+      return;
+    }
+
+
+    if (action === "go-album") {
+
+      goToAlbum(target);
+
+      return;
+    }
+
+
+    if (action === "go-artist") {
+
+      goToArtist(target);
+
+      return;
+    }
+
+
+    if (action === "add-playlist") {
+
+      showAddToPlaylistMenu(target);
+
+      return;
+    }
+
+
+    if (action === "remove-playlist") {
+
+      await removeSongFromPlaylist(
+        target,
+        selectedPlaylistId
+      );
+
+      return;
+    }
+
+
+    if (action === "delete-song") {
+
+      await deleteSong(target);
+
+      return;
+    }
+
+
+    // =================================================
+    // ALBUM
+    // =================================================
+
+    if (action === "play-album") {
+
+      playAlbumContext(target);
+
+      return;
+    }
+
+
+    if (action === "album-next") {
+
+      playAlbumNext(target);
+
+      return;
+    }
+
+
+    if (action === "album-queue") {
+
+      addAlbumToQueue(target);
+
+      return;
+    }
+
+
+    if (action === "album-favorite") {
+
+      await toggleAlbumFavorites(target);
+
+      return;
+    }
+
+
+    if (action === "album-artist") {
+
+      goToAlbumArtist(target);
+
+      return;
+    }
+
+
+    if (action === "delete-album") {
+
+      await deleteAlbum(target);
+
+      return;
+    }
+
+
+    // =================================================
+    // ARTIST
+    // =================================================
+
+    if (action === "play-artist") {
+
+      playArtistContext(target);
+
+      return;
+    }
+
+
+    if (action === "artist-queue") {
+
+      addArtistToQueue(target);
+
+      return;
+    }
+
+
+    // =================================================
+    // PLAYLIST
+    // =================================================
+
+    if (action === "play-playlist") {
+
+      playPlaylistContext(target);
+
+      return;
+    }
+
+
+    if (action === "playlist-next") {
+
+      playPlaylistNext(target);
+
+      return;
+    }
+
+
+    if (action === "playlist-queue") {
+
+      addPlaylistToQueue(target);
+
+      return;
+    }
+
+
+    if (action === "rename-playlist") {
+
+      await renamePlaylist(target);
+
+      return;
+    }
+
+
+    if (action === "delete-playlist") {
+
+      await deletePlaylist(target);
+
+      return;
+    }
+
+  }
+);
+
+function playNextSongContext(song) {
+
+  if (!song) return;
+
+
+  // If nothing is currently playing
+  if (!currentSong) {
+
+    playSong(song);
+
+    return;
+  }
+
+
+  const index =
+    queueIndex + 1;
+
+
+  queueSongs.splice(
+    index,
+    0,
+    song
+  );
+
+
+  renderQueue();
+
+  console.log(
+    "Added song to play next:",
+    song.title
+  );
+}
+
+function getAlbumSongs(album) {
+
+  return library.songs
+    .filter(
+      song =>
+        Number(song.album_id) ===
+        Number(album.id)
+    )
+    .sort(
+      (a, b) =>
+        (a.track_number || 0) -
+        (b.track_number || 0)
+    );
+}
+
+
+function playAlbumContext(album) {
+
+  const songs =
+    getAlbumSongs(album);
+
+  if (!songs.length) return;
+
+  queueSongs = [
+    ...songs
+  ];
+
+  queueIndex = 0;
+
+  renderQueue();
+
+  playSong(
+    songs[0]
+  );
+}
+
+
+function addAlbumToQueue(album) {
+
+  const songs =
+    getAlbumSongs(album);
+
+  songs.forEach(song => {
+
+    if (
+      !queueSongs.some(
+        s => s.id === song.id
+      )
+    ) {
+
+      queueSongs.push(song);
+    }
+
+  });
+
+  renderQueue();
+
+  console.log(
+    "Album added to queue:",
+    album.title
+  );
+}
+
+
+function playAlbumNext(album) {
+
+  const songs =
+    getAlbumSongs(album);
+
+  if (!songs.length) return;
+
+
+  let insertIndex =
+    currentSong
+      ? queueIndex + 1
+      : 0;
+
+
+  queueSongs.splice(
+    insertIndex,
+    0,
+    ...songs.filter(
+      song =>
+        !queueSongs.some(
+          q => q.id === song.id
+        )
+    )
+  );
+
+
+  renderQueue();
+}
+
+async function toggleAlbumFavorites(album) {
+
+  const songs =
+    getAlbumSongs(album);
+
+  if (!songs.length) return;
+
+
+  const allFavorite =
+    songs.every(
+      song =>
+        isSongFavorite(song)
+    );
+
+
+  for (const song of songs) {
+
+    const shouldFavorite =
+      !allFavorite;
+
+    if (
+      isSongFavorite(song) !==
+      shouldFavorite
+    ) {
+
+      await window.electronAPI.setSongFavorite(
+        song.id,
+        shouldFavorite
+      );
+    }
+  }
+
+
+  await loadLibrary();
+
+
+  // Update player favorite icon
+  if (currentSong) {
+
+    const updatedSong =
+      library.songs.find(
+        song =>
+          song.id ===
+          currentSong.id
+      );
+
+    if (updatedSong) {
+
+      currentSong =
+        updatedSong;
+
+      const favoriteIcon =
+        document.querySelector(
+          ".nowPlaying .songIsFavorite"
+        );
+
+      if (favoriteIcon) {
+
+        favoriteIcon.src =
+          isSongFavorite(
+            updatedSong
+          )
+            ? "./icons/likefull.png"
+            : "./icons/favorite.png";
+      }
+    }
+  }
+
+  console.log(
+    allFavorite
+      ? "Removed album from favorites"
+      : "Added album to favorites"
+  );
+}
+
+function getArtistSongs(artist) {
+
+  return library.songs
+    .filter(
+      song =>
+        Number(song.artist_id) ===
+        Number(artist.id)
+    )
+    .sort((a, b) => {
+
+      if (
+        a.album_id !==
+        b.album_id
+      ) {
+
+        return (
+          a.album_id -
+          b.album_id
+        );
+      }
+
+      return (
+        (a.track_number || 0) -
+        (b.track_number || 0)
+      );
+    });
+}
+
+
+function playArtistContext(artist) {
+
+  const songs =
+    getArtistSongs(artist);
+
+  if (!songs.length) return;
+
+  queueSongs = [
+    ...songs
+  ];
+
+  queueIndex = 0;
+
+  renderQueue();
+
+  playSong(
+    songs[0]
+  );
+}
+
+
+function addArtistToQueue(artist) {
+
+  const songs =
+    getArtistSongs(artist);
+
+  songs.forEach(song => {
+
+    if (
+      !queueSongs.some(
+        q => q.id === song.id
+      )
+    ) {
+
+      queueSongs.push(song);
+    }
+
+  });
+
+  renderQueue();
+}
+
+function getArtistSongs(artist) {
+
+  return library.songs
+    .filter(
+      song =>
+        Number(song.artist_id) ===
+        Number(artist.id)
+    )
+    .sort((a, b) => {
+
+      if (
+        a.album_id !==
+        b.album_id
+      ) {
+
+        return (
+          a.album_id -
+          b.album_id
+        );
+      }
+
+      return (
+        (a.track_number || 0) -
+        (b.track_number || 0)
+      );
+    });
+}
+
+
+function playArtistContext(artist) {
+
+  const songs =
+    getArtistSongs(artist);
+
+  if (!songs.length) return;
+
+  queueSongs = [
+    ...songs
+  ];
+
+  queueIndex = 0;
+
+  renderQueue();
+
+  playSong(
+    songs[0]
+  );
+}
+
+
+function addArtistToQueue(artist) {
+
+  const songs =
+    getArtistSongs(artist);
+
+  songs.forEach(song => {
+
+    if (
+      !queueSongs.some(
+        q => q.id === song.id
+      )
+    ) {
+
+      queueSongs.push(song);
+    }
+
+  });
+
+  renderQueue();
+}
+
+function goToAlbum(song) {
+
+  const album =
+    library.albums.find(
+      album =>
+        Number(album.id) ===
+        Number(song.album_id)
+    );
+
+  if (!album) return;
+
+
+  activeTab = "albums";
+
+  document
+    .querySelectorAll(".musicTabs")
+    .forEach(tab => {
+
+      tab.classList.remove(
+        "active"
+      );
+    });
+
+
+  document
+    .getElementById("albums")
+    ?.classList.add(
+      "active"
+    );
+
+
+  renderCurrentView();
+
+
+  setTimeout(() => {
+
+    renderSelectedAlbum(
+      album.id
+    );
+
+    const trackList =
+      document.getElementById(
+        "trackListContainer"
+      );
+
+    if (trackList) {
+
+      trackList.style.display =
+        "block";
+    }
+
+  }, 0);
+}
+
+function goToArtist(song) {
+
+  const artist =
+    library.artists.find(
+      artist =>
+        Number(artist.id) ===
+        Number(song.artist_id)
+    );
+
+  if (!artist) return;
+
+
+  activeTab = "artists";
+
+  selectedArtistId =
+    artist.id;
+
+
+  document
+    .querySelectorAll(".musicTabs")
+    .forEach(tab => {
+
+      tab.classList.remove(
+        "active"
+      );
+    });
+
+
+  document
+    .getElementById("artists")
+    ?.classList.add(
+      "active"
+    );
+
+
+  renderCurrentView();
+}
+
+function getPlaylistSongs(playlist) {
+
+  return playlist.song_ids
+    .map(songId =>
+      library.songs.find(
+        song =>
+          Number(song.id) ===
+          Number(songId)
+      )
+    )
+    .filter(Boolean);
+}
+
+
+function playPlaylistContext(playlist) {
+
+  const songs =
+    getPlaylistSongs(
+      playlist
+    );
+
+  if (!songs.length) return;
+
+  queueSongs = [
+    ...songs
+  ];
+
+  queueIndex = 0;
+
+  renderQueue();
+
+  playSong(
+    songs[0]
+  );
+}
+
+
+function addPlaylistToQueue(playlist) {
+
+  const songs =
+    getPlaylistSongs(
+      playlist
+    );
+
+  songs.forEach(song => {
+
+    if (
+      !queueSongs.some(
+        q => q.id === song.id
+      )
+    ) {
+
+      queueSongs.push(song);
+    }
+
+  });
+
+  renderQueue();
+}
+
+
+function playPlaylistNext(playlist) {
+
+  const songs =
+    getPlaylistSongs(
+      playlist
+    );
+
+  if (!songs.length) return;
+
+
+  const newSongs =
+    songs.filter(
+      song =>
+        !queueSongs.some(
+          q => q.id === song.id
+        )
+    );
+
+
+  const index =
+    currentSong
+      ? queueIndex + 1
+      : 0;
+
+
+  queueSongs.splice(
+    index,
+    0,
+    ...newSongs
+  );
+
+
+  renderQueue();
+}
+
+async function removeSongFromPlaylist(
+  song,
+  playlistId
+) {
+
+  if (!playlistId) return;
+
+
+  try {
+
+    await window.electronAPI.removeSongFromPlaylist(
+      playlistId,
+      song.id
+    );
+
+
+    await loadLibrary();
+
+
+    console.log(
+      "Removed from playlist:",
+      song.title
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Failed to remove song from playlist:",
+      error
+    );
+  }
+}
+
+const playlistPicker =
+  document.getElementById(
+    "playlistPicker"
+  );
+
+const playlistPickerList =
+  document.getElementById(
+    "playlistPickerList"
+  );
+
+
+async function showAddToPlaylistMenu(song) {
+
+  playlistPickerList.innerHTML = "";
+
+
+  const playlists =
+    library.playlists.filter(
+      playlist =>
+        playlist.name !== "Favorites"
+    );
+
+
+  if (!playlists.length) {
+
+    playlistPickerList.innerHTML = `
+      <div style="
+        padding:12px;
+        color:#aaa;
+        font-size:13px;
+      ">
+        No playlists
+      </div>
+    `;
+
+  } else {
+
+    playlists.forEach(
+      playlist => {
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+        button.className =
+          "playlistPickerItem";
+
+        button.textContent =
+          playlist.name;
+
+
+        button.addEventListener(
+          "click",
+          async () => {
+
+            await addSongToPlaylist(
+              song,
+              playlist
+            );
+
+            playlistPicker.style.display =
+              "none";
+          }
+        );
+
+
+        playlistPickerList.appendChild(
+          button
+        );
+      }
+    );
+  }
+
+
+  playlistPicker.style.display =
+    "block";
+
+
+  const x =
+    Math.min(
+      window.innerWidth -
+        playlistPicker.offsetWidth -
+        10,
+      window.innerWidth / 2
+    );
+
+
+  const y =
+    Math.min(
+      window.innerHeight -
+        playlistPicker.offsetHeight -
+        10,
+      window.innerHeight / 2
+    );
+
+
+  playlistPicker.style.left =
+    `${Math.max(5, x)}px`;
+
+  playlistPicker.style.top =
+    `${Math.max(5, y)}px`;
+}
+
+async function addSongToPlaylist(
+  song,
+  playlist
+) {
+
+  try {
+
+    await window.electronAPI.addSongToPlaylist(
+      playlist.id,
+      song.id
+    );
+
+
+    await loadLibrary();
+
+
+    console.log(
+      `Added ${song.title} to ${playlist.name}`
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Failed to add song to playlist:",
+      error
+    );
+  }
+}
+
+async function deleteSong(song) {
+
+  const confirmed =
+    confirm(
+      `Delete "${song.title}" from your library?`
+    );
+
+  if (!confirmed) return;
+
+
+  try {
+
+    await window.electronAPI.deleteSong(
+      song.id
+    );
+
+
+    // Remove from queue
+    queueSongs =
+      queueSongs.filter(
+        s => s.id !== song.id
+      );
+
+
+    // If currently playing
+    if (
+      currentSong &&
+      currentSong.id === song.id
+    ) {
+
+      audio.pause();
+
+      currentSong = null;
+
+      audio.src = "";
+
+      updatePlayButton();
+    }
+
+
+    await loadLibrary();
+
+    renderQueue();
+
+
+  } catch (error) {
+
+    console.error(
+      "Failed to delete song:",
+      error
+    );
+  }
+}
+
+
+async function deleteAlbum(album) {
+
+  const songs =
+    getAlbumSongs(album);
+
+
+  const confirmed =
+    confirm(
+      `Delete album "${album.title}" and its ${songs.length} songs?`
+    );
+
+
+  if (!confirmed) return;
+
+
+  try {
+
+    await window.electronAPI.deleteAlbum(
+      album.id
+    );
+
+
+    queueSongs =
+      queueSongs.filter(
+        song =>
+          Number(song.album_id) !==
+          Number(album.id)
+      );
+
+
+    if (
+      currentSong &&
+      Number(currentSong.album_id) ===
+      Number(album.id)
+    ) {
+
+      audio.pause();
+
+      currentSong = null;
+
+      audio.src = "";
+
+      updatePlayButton();
+    }
+
+
+    await loadLibrary();
+
+    renderQueue();
+
+
+  } catch (error) {
+
+    console.error(
+      "Failed to delete album:",
+      error
+    );
+  }
+}
+
+async function renamePlaylist(
+  playlist
+) {
+
+  const newName =
+    prompt(
+      "Enter a new playlist name:",
+      playlist.name
+    );
+
+
+  if (
+    !newName ||
+    !newName.trim()
+  ) {
+    return;
+  }
+
+
+  try {
+
+    await window.electronAPI.renamePlaylist(
+      playlist.id,
+      newName.trim()
+    );
+
+
+    await loadLibrary();
+
+  } catch (error) {
+
+    console.error(
+      "Failed to rename playlist:",
+      error
+    );
+  }
+}
+
+async function deletePlaylist(
+  playlist
+) {
+
+  if (
+    playlist.name ===
+    "Favorites"
+  ) {
+
+    alert(
+      "The Favorites playlist cannot be deleted."
+    );
+
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      `Delete playlist "${playlist.name}"?`
+    );
+
+
+  if (!confirmed) return;
+
+
+  try {
+
+    await window.electronAPI.deletePlaylist(
+      playlist.id
+    );
+
+
+    if (
+      Number(selectedPlaylistId) ===
+      Number(playlist.id)
+    ) {
+
+      selectedPlaylistId =
+        null;
+    }
+
+
+    await loadLibrary();
+
+  } catch (error) {
+
+    console.error(
+      "Failed to delete playlist:",
+      error
+    );
+  }
+}
+
+
 const musicTabs = document.querySelectorAll('.musicTabs'); 
 
 musicTabs.forEach(tab => {

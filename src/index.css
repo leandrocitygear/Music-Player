@@ -1137,3 +1137,193 @@ background: rgba(255, 255, 255, 0.1);
 .songContainer.active .songStatusIcon:hover {
   border: solid 1px white;
 }
+
+
+/* ========================================
+   CONTEXT MENU
+======================================== */
+
+.contextMenu {
+    position: fixed;
+
+    min-width: 210px;
+
+    background: rgba(25, 25, 25, 0.96);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 8px;
+
+    padding: 5px 0;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.45);
+
+    backdrop-filter: blur(15px);
+
+    -webkit-backdrop-filter: blur(15px);
+
+    z-index: 999999;
+
+    display: none;
+
+    user-select: none;
+}
+
+
+/* ========================================
+   MENU ITEM
+======================================== */
+
+.contextItem {
+    width: 100%;
+
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 0 12px;
+
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+
+.contextItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+.contextItem span:first-child {
+    width: 20px;
+
+    text-align: center;
+
+    flex-shrink: 0;
+}
+
+
+.contextItem span:last-child {
+    white-space: nowrap;
+}
+
+
+/* ========================================
+   DIVIDER
+======================================== */
+
+.contextDivider {
+    height: 1px;
+
+    margin: 5px 8px;
+
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* ========================================
+   DELETE / DANGER
+======================================== */
+
+.contextItem.danger {
+    color: #ff6b6b;
+}
+
+
+.contextItem.danger:hover {
+    background: rgba(255, 80, 80, 0.12);
+}
+
+
+/* ========================================
+   MENU SECTIONS
+======================================== */
+
+.contextSection {
+    display: none;
+}
+
+
+.contextSection.active {
+    display: block;
+}
+
+.playlistPicker {
+    position: fixed;
+
+    min-width: 220px;
+
+    max-height: 300px;
+
+    overflow-y: auto;
+
+    background: rgba(25, 25, 25, 0.97);
+
+    border: 1px solid rgba(255, 255, 255, 0.12);
+
+    border-radius: 8px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.45);
+
+    backdrop-filter: blur(15px);
+
+    z-index: 1000000;
+
+    display: none;
+}
+
+
+.playlistPickerHeader {
+    padding: 10px 12px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    color: white;
+
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.1);
+}
+
+
+.playlistPickerItem {
+    width: 100%;
+
+    height: 36px;
+
+    padding: 0 12px;
+
+    border: none;
+
+    background: transparent;
+
+    color: white;
+
+    text-align: left;
+
+    cursor: pointer;
+}
+
+
+.playlistPickerItem:hover {
+    background:
+        rgba(255, 255, 255, 0.1);
+}

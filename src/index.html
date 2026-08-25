@@ -108,6 +108,8 @@
   </div>
   </div>
 
+  <div id="contextMenu" class="contextMenu"></div>
+
   <div id="settings" title="Add Music">
     <img src="./icons/add.png" alt="">
   </div>
@@ -128,6 +130,7 @@
     <div class="musicTabs" id="genres">GENRES</div>
     <div class="musicTabs" id="playlist">PLAYLIST</div>
   </div> 
+  
 
   <div id="results">
     <!-- <div class="musicbox">
@@ -165,6 +168,186 @@
     </div>
   </div>
   
+</div>
+
+<!-- =========================
+     CONTEXT MENU
+========================= -->
+
+<div id="contextMenu" class="contextMenu">
+
+  <!-- SONG -->
+  <div class="contextSection" data-menu="song">
+
+    <button class="contextItem" data-action="play">
+      <span>▶</span>
+      <span>Play</span>
+    </button>
+
+    <button class="contextItem" data-action="play-next">
+      <span>⏭</span>
+      <span>Play Next</span>
+    </button>
+
+    <button class="contextItem" data-action="add-queue">
+      <span>➕</span>
+      <span>Add to Queue</span>
+    </button>
+
+    <div class="contextDivider"></div>
+
+    <button class="contextItem" data-action="favorite">
+      <span>❤️</span>
+      <span class="favoriteText">
+        Add to Favorites
+      </span>
+    </button>
+
+    <div class="contextDivider"></div>
+
+    <button class="contextItem" data-action="go-album">
+      <span>📀</span>
+      <span>Go to Album</span>
+    </button>
+
+    <button class="contextItem" data-action="go-artist">
+      <span>👤</span>
+      <span>Go to Artist</span>
+    </button>
+
+    <button class="contextItem" data-action="add-playlist">
+      <span>➕</span>
+      <span>Add to Playlist</span>
+    </button>
+
+    <button
+      class="contextItem"
+      data-action="remove-playlist"
+      id="removeFromPlaylistItem"
+    >
+      <span>🗑</span>
+      <span>Remove from Playlist</span>
+    </button>
+
+    <div class="contextDivider"></div>
+
+    <button
+      class="contextItem danger"
+      data-action="delete-song"
+    >
+      <span>🗑</span>
+      <span>Delete Song</span>
+    </button>
+
+  </div>
+
+
+  <!-- ALBUM -->
+  <div class="contextSection" data-menu="album">
+
+    <button class="contextItem" data-action="play-album">
+      <span>▶</span>
+      <span>Play Album</span>
+    </button>
+
+    <button class="contextItem" data-action="album-next">
+      <span>⏭</span>
+      <span>Play Next</span>
+    </button>
+
+    <button class="contextItem" data-action="album-queue">
+      <span>➕</span>
+      <span>Add Album to Queue</span>
+    </button>
+
+    <div class="contextDivider"></div>
+
+    <button class="contextItem" data-action="album-favorite">
+      <span>❤️</span>
+      <span class="albumFavoriteText">
+        Add All to Favorites
+      </span>
+    </button>
+
+    <button class="contextItem" data-action="album-artist">
+      <span>👤</span>
+      <span>Go to Artist</span>
+    </button>
+
+    <div class="contextDivider"></div>
+
+    <button
+      class="contextItem danger"
+      data-action="delete-album"
+    >
+      <span>🗑</span>
+      <span>Delete Album</span>
+    </button>
+
+  </div>
+
+
+  <!-- ARTIST -->
+  <div class="contextSection" data-menu="artist">
+
+    <button class="contextItem" data-action="play-artist">
+      <span>▶</span>
+      <span>Play Artist</span>
+    </button>
+
+    <button class="contextItem" data-action="artist-queue">
+      <span>➕</span>
+      <span>Add Artist to Queue</span>
+    </button>
+
+  </div>
+
+
+  <!-- PLAYLIST -->
+  <div class="contextSection" data-menu="playlist">
+
+    <button class="contextItem" data-action="play-playlist">
+      <span>▶</span>
+      <span>Play Playlist</span>
+    </button>
+
+    <button class="contextItem" data-action="playlist-next">
+      <span>⏭</span>
+      <span>Play Next</span>
+    </button>
+
+    <button class="contextItem" data-action="playlist-queue">
+      <span>➕</span>
+      <span>Add Playlist to Queue</span>
+    </button>
+
+    <div class="contextDivider"></div>
+
+    <button class="contextItem" data-action="rename-playlist">
+      <span>✏️</span>
+      <span>Rename</span>
+    </button>
+
+    <button
+      class="contextItem danger"
+      data-action="delete-playlist"
+    >
+      <span>🗑</span>
+      <span>Delete Playlist</span>
+    </button>
+
+  </div>
+
+</div>
+
+<div id="playlistPicker" class="playlistPicker">
+
+  <div class="playlistPickerHeader">
+    Add to Playlist
+  </div>
+
+  <div id="playlistPickerList"></div>
+
 </div>
 
 <script src="./render.js"></script>
