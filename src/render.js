@@ -65,6 +65,7 @@ let queueIndex = -1;
       console.log("Playlists:", library.playlists);
       
       renderCurrentView();
+    
       
     } catch (error) {
       console.error(
@@ -352,7 +353,11 @@ function renderArtistMusic() {
           </div>
 
           <img class="songIsFavorite"
-            src="./icons/favorite.png" 
+            src="${
+    isSongFavorite(song)
+      ? "./icons/likefull.png"
+      : "./icons/favorite.png"
+  }"
             alt=""
           >
 
@@ -456,7 +461,11 @@ function renderSelectedAlbum(albumId) {
 
       <img
        class="songIsFavorite"
-        src="./icons/favorite.png"
+        src="${
+    isSongFavorite(song)
+      ? "./icons/likefull.png"
+      : "./icons/favorite.png"
+  }"
         alt=""
       >
 
@@ -585,7 +594,11 @@ const genreSongs =
 
           <img
             class="songIsFavorite"
-            src="./icons/favorite.png"
+            src="${
+    isSongFavorite(song)
+      ? "./icons/likefull.png"
+      : "./icons/favorite.png"
+  }"
             alt=""
           >
 
@@ -622,7 +635,7 @@ function renderPlaylistMusic() {
     `;
   }
 
-  const playlistSongs = playlist.song_ids
+  const songs = playlist.song_ids
     .map(songId =>
       library.songs.find(
         song =>
@@ -632,38 +645,41 @@ function renderPlaylistMusic() {
     )
     .filter(Boolean);
 
-  if (playlistSongs.length === 0) {
+  if (songs.length === 0) {
     return `
       <div class="emptyMusicMessage">
-        This playlist is empty
+        No songs in this playlist
       </div>
     `;
   }
 
   return `
-    <div class="artistAlbumBox">
+    <div class="playlistSongs">
 
-      <img
-        class="artistAlbumImg"
-        src="${
-          playlistSongs[0].artwork_path ||
-          "./icons/album.png"
-        }"
-        alt=""
-      >
+      <div class="playlistHeader">
 
-      <div class="artistAlbumInfo">
+        <div class="playlistArtwork">
+          <img
+            src="${
+              playlist.artwork_path ||
+              "./icons/playlist.png"
+            }"
+          >
+        </div>
 
-        <p>${playlist.name}</p>
+        <div class="playlistInfo">
+          <p class="playlistTitle">
+            ${playlist.name}
+          </p>
 
-        <p>
-          ${playlistSongs.length}
-          ${playlistSongs.length === 1 ? "song" : "songs"}
-        </p>
+          <p class="playlistSongCount">
+            ${songs.length} songs
+          </p>
+        </div>
 
       </div>
 
-      ${playlistSongs.map((song, index) => `
+      ${songs.map((song, index) => `
 
         <div
           class="songContainer"
@@ -678,7 +694,9 @@ function renderPlaylistMusic() {
               alt=""
             >
 
-            <p>${index + 1}</p>
+            <p>
+              ${index + 1}
+            </p>
 
             <p title="${song.title}">
               ${song.title}
@@ -688,7 +706,11 @@ function renderPlaylistMusic() {
 
           <img
             class="songIsFavorite"
-            src="./icons/favorite.png"
+            src="${
+  isSongFavorite(song)
+    ? "./icons/likefull.png"
+    : "./icons/favorite.png"
+}"
             alt=""
           >
 
@@ -827,35 +849,45 @@ function renderGenres() {
 }
 
 function renderPlaylists() {
-  const results = document.getElementById("results");
+   const results =
+    document.getElementById('results');
 
   results.innerHTML = `
+
     <div id="playlistWindow">
 
       <div id="playlistList">
 
         ${library.playlists.map(playlist => `
+
           <div
             class="playlistBox ${
-              playlist.id === selectedPlaylistId
+              Number(playlist.id) ===
+              Number(selectedPlaylistId)
                 ? "active"
                 : ""
             }"
             data-playlist-id="${playlist.id}"
           >
+
             <p class="playlistName">
               ${playlist.name}
             </p>
+
           </div>
+
         `).join("")}
 
       </div>
 
       <div id="playlistMusicResults">
+
         ${renderPlaylistMusic()}
+
       </div>
 
     </div>
+
   `;
 
   updateActiveSong();
@@ -1970,6 +2002,84 @@ function playGenreSong(song, genreId) {
   playSong(song);
 }
 
+function isSongFavorite(song) {
+  return Number(song.is_favorite) === 1;
+}
+
+function updateFavoriteIcons() {
+
+  document
+    .querySelectorAll(".songIsFavorite")
+    .forEach(icon => {
+
+      const songElement =
+        icon.closest(
+          ".songContainer, .songRow"
+        );
+
+      if (!songElement) return;
+
+      const songId =
+        songElement.dataset.songId;
+
+      const song =
+        library.songs.find(
+          song =>
+            String(song.id) ===
+            String(songId)
+        );
+
+      if (!song) return;
+
+      icon.src = isSongFavorite(song)
+        ? "./icons/likefull.png"
+        : "./icons/favorite.png";
+    });
+}
+
+async function toggleFavorite(song) {
+
+ if (!song) return;
+
+  const newFavoriteState = !isSongFavorite(song);
+
+  try {
+    await window.electronAPI.setSongFavorite(
+      song.id,
+      newFavoriteState
+    );
+
+    // Update renderer copy
+    song.is_favorite = newFavoriteState ? 1 : 0;
+
+    // Reload the library so Favorites playlist gets updated
+    const data = await window.electronAPI.getLibrary();
+
+    library.albums = data.albums;
+    library.artists = data.artists;
+    library.songs = data.songs;
+    library.genres = data.genres;
+    library.playlists = data.playlists;
+
+    // Refresh the current view
+    renderCurrentView();
+    updateFavoriteIcons();
+
+    console.log(
+      newFavoriteState
+        ? "Added to favorites:"
+        : "Removed from favorites:",
+      song.title
+    );
+
+  } catch (error) {
+    console.error(
+      "Failed to update favorite:",
+      error
+    );
+  }
+}
+
 
 
 const musicTabs = document.querySelectorAll('.musicTabs'); 
@@ -2192,6 +2302,39 @@ if (genreClick) {
     // LIBRARY SONG
     // =========================
 
+    const favoriteIcon =
+  event.target.closest(
+    ".songIsFavorite"
+  );
+
+if (favoriteIcon) {
+
+  event.stopPropagation();
+
+  const songElement =
+    favoriteIcon.closest(
+      ".songContainer, .songRow"
+    );
+
+  if (!songElement) return;
+
+  const songId =
+    songElement.dataset.songId;
+
+  const song =
+    library.songs.find(
+      song =>
+        String(song.id) ===
+        String(songId)
+    );
+
+  if (!song) return;
+
+  await toggleFavorite(song);
+
+  return;
+}
+
     const songElement =
       event.target.closest(
         ".songContainer, .songRow"
@@ -2351,37 +2494,6 @@ else if (activeTab === "genres") {
     return;
   }
 
-  else if (activeTab === "playlist") {
-
-  const playlist =
-    library.playlists.find(
-      playlist =>
-        Number(playlist.id) ===
-        Number(selectedPlaylistId)
-    );
-
-  if (!playlist) {
-    console.error(
-      "Playlist not found:",
-      selectedPlaylistId
-    );
-
-    return;
-  }
-
-  songsForQueue =
-    playlist.song_ids
-      .map(songId =>
-        library.songs.find(
-          song =>
-            Number(song.id) ===
-            Number(songId)
-        )
-      )
-      .filter(Boolean);
-
-}
-
 
   // Find albums belonging to this genre
   const genreAlbums =
@@ -2440,6 +2552,34 @@ else if (activeTab === "genres") {
     "Genre songs:",
     songsForQueue
   );
+
+}
+
+else if (activeTab === "playlist") {
+
+    const playlist = library.playlists.find(
+        playlist =>
+            Number(playlist.id) ===
+            Number(selectedPlaylistId)
+    );
+
+    if (!playlist) {
+        console.error(
+            "Playlist not found:",
+            selectedPlaylistId
+        );
+        return;
+    }
+
+    songsForQueue = playlist.song_ids
+        .map(songId =>
+            library.songs.find(
+                song =>
+                    Number(song.id) ===
+                    Number(songId)
+            )
+        )
+        .filter(Boolean);
 
 }
 

@@ -16,7 +16,8 @@ const {
   addGenre,
   addAlbum,
   addSong,
-  addFolder
+  addFolder,
+  setSongFavorite
 } = require("./queries");
 
 const {
@@ -224,6 +225,19 @@ ipcMain.handle('decode-alac', async (event, filePath) => {
     throw error;
   }
 });
+
+
+ipcMain.handle(
+  "set-song-favorite",
+  (event, songId, isFavorite) => {
+
+    return setSongFavorite(
+      songId,
+      isFavorite
+    );
+  }
+);
+
 // This method will be called when Electron has finishe
 // initialization and is ready to create browser windo.
 // Some APIs can only be used after this event occurs.

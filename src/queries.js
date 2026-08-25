@@ -118,17 +118,30 @@ function getGenres() {
 // =========================
 
 function getPlaylists() {
-  return db.prepare(`
-    SELECT
-      id,
-      name,
-      description,
-      artwork_path,
-      created_at,
-      updated_at
+ 
+  const playlists = db.prepare(`
+    SELECT *
     FROM playlists
     ORDER BY name
   `).all();
+
+  const getPlaylistSongs = db.prepare(`
+    SELECT song_id
+    FROM playlist_songs
+    WHERE playlist_id = ?
+    ORDER BY position
+  `);
+
+  return playlists.map(playlist => {
+
+    const songs = getPlaylistSongs.all(playlist.id);
+
+    return {
+      ...playlist,
+      song_ids: songs.map(song => song.song_id)
+    };
+
+  });
 }
 
 
@@ -495,6 +508,64 @@ function getSong(id) {
   `).get(id);
 }
 
+function setSongFavorite(songId, isFavorite) {
+  
+ const favoritesPlaylist = db.prepare(`
+        SELECT id
+        FROM playlists
+        WHERE name = 'Favorites'
+    `).get();
+
+    if (!favoritesPlaylist) {
+        throw new Error("Favorites playlist not found");
+    }
+
+    // Update favorite state
+    db.prepare(`
+        UPDATE songs
+        SET is_favorite = ?
+        WHERE id = ?
+    `).run(
+        isFavorite ? 1 : 0,
+        songId
+    );
+
+    if (isFavorite) {
+
+        // Get the next position
+        const result = db.prepare(`
+            SELECT COALESCE(MAX(position), 0) + 1 AS nextPosition
+            FROM playlist_songs
+            WHERE playlist_id = ?
+        `).get(favoritesPlaylist.id);
+
+        db.prepare(`
+            INSERT OR IGNORE INTO playlist_songs
+            (
+                playlist_id,
+                song_id,
+                position
+            )
+            VALUES (?, ?, ?)
+        `).run(
+            favoritesPlaylist.id,
+            songId,
+            result.nextPosition
+        );
+
+    } else {
+
+        db.prepare(`
+            DELETE FROM playlist_songs
+            WHERE playlist_id = ?
+            AND song_id = ?
+        `).run(
+            favoritesPlaylist.id,
+            songId
+        );
+    }
+}
+
 module.exports = {
   db,
   getLibrary,
@@ -513,5 +584,6 @@ module.exports = {
   addFolder,
   updateAlbumArtwork,
   updateArtistArtwork,
-  getArtistsWithoutArtwork
+  getArtistsWithoutArtwork,
+  setSongFavorite
 };

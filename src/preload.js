@@ -90,6 +90,16 @@ selectMusicFolder: () =>
   ipcRenderer.invoke(
     'decode-alac',
     filePath
+  ),
+
+  setSongFavorite: (
+  songId,
+  isFavorite
+) =>
+  ipcRenderer.invoke(
+    "set-song-favorite",
+    songId,
+    isFavorite
   )
       
 });

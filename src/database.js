@@ -137,7 +137,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS playlists (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     description TEXT,
 
     artwork_path TEXT,
@@ -155,6 +155,9 @@ db.exec(`
     added_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     PRIMARY KEY (playlist_id, position),
+
+
+  UNIQUE (playlist_id, song_id),
 
     FOREIGN KEY (playlist_id)
       REFERENCES playlists(id)
@@ -179,6 +182,19 @@ db.exec(`
       ON DELETE CASCADE
   );
 `);
+
+// =====================================
+// CREATE DEFAULT PLAYLISTS
+// =====================================
+
+db.prepare(`
+  INSERT OR IGNORE INTO playlists
+  (name, description)
+  VALUES (?, ?)
+`).run(
+  "Favorites",
+  "Your favorite songs"
+);
 
 console.log("Disc-Out database initialized.");
 
