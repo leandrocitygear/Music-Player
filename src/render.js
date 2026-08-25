@@ -465,6 +465,139 @@ function renderSelectedAlbum(albumId) {
   `).join('');
 }
 
+function renderGenreMusic() {
+
+  if (!selectedGenreId) {
+    return `
+      <div class="emptyMusicMessage">
+        Select a genre
+      </div>
+    `;
+  }
+
+ const genreAlbums = library.albums.filter(
+  album =>
+    Number(album.genre_id) ===
+    Number(selectedGenreId)
+);
+
+const genreAlbumIds =
+  genreAlbums.map(album => album.id);
+
+const genreSongs =
+  library.songs.filter(
+    song =>
+      genreAlbumIds.includes(song.album_id)
+  );
+
+  if (genreSongs.length === 0) {
+    return `
+      <div class="emptyMusicMessage">
+        No songs found
+      </div>
+    `;
+  }
+
+  // Group songs by album
+  const albums = [];
+
+  genreSongs.forEach(song => {
+
+    let album = albums.find(
+      album => album.id === song.album_id
+    );
+
+    if (!album) {
+
+      album = {
+        id: song.album_id,
+        title: song.album,
+        artwork_path: song.artwork_path,
+        release_year: song.release_year,
+        songs: []
+      };
+
+      albums.push(album);
+    }
+
+    album.songs.push(song);
+  });
+
+
+  // Sort songs inside each album
+  albums.forEach(album => {
+
+    album.songs.sort(
+      (a, b) =>
+        (a.track_number || 0) -
+        (b.track_number || 0)
+    );
+
+  });
+
+
+  return albums.map(album => `
+
+    <div class="artistAlbumBox">
+
+      <img
+        class="artistAlbumImg"
+        src="${album.artwork_path || './icons/album.png'}"
+      >
+
+      <div class="artistAlbumInfo">
+
+        <p>
+          ${album.title || 'Unknown Album'}
+        </p>
+
+        <p>
+          ${album.release_year || ''}
+        </p>
+
+      </div>
+
+
+      ${album.songs.map((song, index) => `
+
+        <div
+          class="songContainer"
+          data-song-id="${song.id}"
+        >
+
+          <div id="leftSpan">
+
+            <img
+              class="songStatusIcon"
+              src="./icons/play.png"
+              alt=""
+            >
+
+            <p>
+              ${song.track_number || index + 1}
+            </p>
+
+            <p title="${song.title}">
+              ${song.title}
+            </p>
+
+          </div>
+
+          <img
+            class="songIsFavorite"
+            src="./icons/favorite.png"
+            alt=""
+          >
+
+        </div>
+
+      `).join("")}
+
+    </div>
+
+  `).join("");
+}
+
 
 
 function renderAlbums() {
@@ -549,21 +682,63 @@ function renderSongs() {
 }
 
 function renderGenres() {
-  const results = document.getElementById('results');
+
+  const results =
+    document.getElementById('results');
 
 
   results.innerHTML = `
+
+    <div id="genreWindow">
+
+      <div id="genreList">
+
+        ${library.genres.map(genre => `
+
+          <div
+            class="genreBox ${genre.id === selectedGenreId ? 'active' : ''}"
+            data-genre-id="${genre.id}"
+          >
+
+            <p class="genreName">
+              ${genre.name}
+            </p>
+
+          </div>
+
+        `).join("")}
+
+      </div>
+
+
+      <div id="genreMusicResults">
+
+        ${renderGenreMusic()}
+
+      </div>
+
+    </div>
+
+  `;
+
+  updateActiveSong();
+}
+
+function renderPlaylists() {
+  const results = document.getElementById('results');
+
+  results.innerHTML = `
   
-  <div id="genreWindow">
-  <div id=genreList>
-  ${library.genres.map(genre => `
-    <div class="genreBox"
-    data-genre-id="${genre.id}">
-      <p class="genreName">${genre.name}</p>
+  <div id="playlistWindow">
+  <div id=playlistList>
+  ${library.playlists.map(playlist => `
+    <div class="playlistBox"
+    data-playlist-id="${playlist.id}">
+      <p class="playlistName">${playlist.name}</p>
     </div>
     `).join("")}
     </div>
-    <div id="genreMusicResults">
+    <div id="playlistMusicResults">
     
       <div class="artistAlbumBox">
       <img class="artistAlbumImg" src=""/>
@@ -571,7 +746,7 @@ function renderGenres() {
       <p></p>
       <p></p>
       </div>
-     
+      
         <div class="songContainer">
           <div id="leftSpan">
             <img src="./icons/volume.png" alt="">
@@ -580,14 +755,14 @@ function renderGenres() {
           </div>
           <img src="./icons/favorite.png" alt="">
         </div>
-       
+        
       </div>
       
     </div>
     </div>
-    
     `
-};
+  };
+  
 
 function renderQueue() {
 
@@ -1606,6 +1781,97 @@ progress.addEventListener("mousedown", (event) => {
 
 });
 
+function playArtistSong(song) {
+
+  const artistSongs = library.songs
+    .filter(s => s.artist_id === song.artist_id)
+    .sort((a, b) => {
+
+      if (a.album_id !== b.album_id) {
+        return a.album_id - b.album_id;
+      }
+
+      return (a.track_number || 0) -
+             (b.track_number || 0);
+    });
+
+  const clickedIndex = artistSongs.findIndex(
+    s => s.id === song.id
+  );
+
+  queueSongs = artistSongs.slice(clickedIndex);
+
+  queueIndex = 0;
+
+  renderQueue();
+
+  playSong(song);
+}
+
+function playAllSongs(song) {
+
+  const allSongs = [...library.songs];
+
+  const clickedIndex = allSongs.findIndex(
+    s => s.id === song.id
+  );
+
+  queueSongs = allSongs.slice(clickedIndex);
+
+  queueIndex = 0;
+
+  renderQueue();
+
+  playSong(song);
+}
+
+function playGenreSong(song, genreId) {
+
+  // Get all albums that belong to this genre
+  const genreAlbums = library.albums.filter(
+    album => album.genre_id === genreId
+  );
+
+  const genreAlbumIds = genreAlbums.map(
+    album => album.id
+  );
+
+  // Get every song from those albums
+  const genreSongs = library.songs
+    .filter(song =>
+      genreAlbumIds.includes(song.album_id)
+    )
+    .sort((a, b) => {
+
+      // Album order
+      if (a.album_id !== b.album_id) {
+        return a.album_id - b.album_id;
+      }
+
+      // Track order within album
+      return (a.track_number || 0) -
+             (b.track_number || 0);
+    });
+
+  // Find clicked song
+  const clickedIndex = genreSongs.findIndex(
+    s => s.id === song.id
+  );
+
+  if (clickedIndex === -1) {
+    return;
+  }
+
+  // Start queue at clicked song
+  queueSongs = genreSongs.slice(clickedIndex);
+
+  queueIndex = 0;
+
+  renderQueue();
+
+  playSong(song);
+}
+
 
 
 const musicTabs = document.querySelectorAll('.musicTabs'); 
@@ -1720,21 +1986,30 @@ musicTabs.forEach(tab => {
 
     const genreClick =
       event.target.closest(".genreBox");
+if (genreClick) {
 
-    if (genreClick) {
+  selectedGenreId =
+    Number(genreClick.dataset.genreId);
 
-      selectedGenreId =
-        Number(
-          genreClick.dataset.genreId
-        );
+  document
+    .querySelectorAll('.genreBox')
+    .forEach(genre => {
+      genre.classList.remove('active');
+    });
 
-      console.log(
-        "Selected genre:",
-        selectedGenreId
-      );
+  genreClick.classList.add('active');
 
-      return;
-    }
+
+  const genreMusicResults =
+    document.getElementById('genreMusicResults');
+
+  genreMusicResults.innerHTML =
+    renderGenreMusic();
+
+  updateActiveSong();
+
+  return;
+}
 
 
     // =========================
@@ -1865,60 +2140,212 @@ musicTabs.forEach(tab => {
     // CREATE ALBUM QUEUE
     // =========================
 
-    const albumSongs =
-      library.songs
-        .filter(
-          s =>
-            s.album_id ===
-            song.album_id
-        )
-        .sort(
-          (a, b) =>
-            (a.track_number || 0) -
-            (b.track_number || 0)
+   // =========================
+// CREATE QUEUE BASED ON TAB
+// =========================
+
+let songsForQueue = [];
+
+
+if (activeTab === "albums") {
+
+  // =========================
+  // ALBUM
+  // =========================
+
+  songsForQueue =
+    library.songs
+      .filter(
+        s =>
+          s.album_id ===
+          song.album_id
+      )
+      .sort(
+        (a, b) =>
+          (a.track_number || 0) -
+          (b.track_number || 0)
+      );
+
+}
+
+
+else if (activeTab === "artists") {
+
+  // =========================
+  // ARTIST
+  // =========================
+
+  songsForQueue =
+    library.songs
+      .filter(
+        s =>
+          s.artist_id ===
+          song.artist_id
+      )
+      .sort((a, b) => {
+
+        // Sort albums first
+        if (a.album_id !== b.album_id) {
+          return a.album_id - b.album_id;
+        }
+
+        // Then tracks
+        return (
+          (a.track_number || 0) -
+          (b.track_number || 0)
         );
 
+      });
 
-    const clickedIndex =
-      albumSongs.findIndex(
-        s =>
-          String(s.id) ===
-          String(song.id)
-      );
+}
 
 
-    if (clickedIndex === -1) {
+else if (activeTab === "songs") {
 
-      console.error(
-        "Song not found in album:",
-        song.id
-      );
+  // =========================
+  // ALL SONGS
+  // =========================
 
-      return;
-    }
+  songsForQueue =
+    [...library.songs];
 
-
-    // Current song + everything after it
-    queueSongs =
-      albumSongs.slice(
-        clickedIndex
-      );
+}
 
 
-    // Current song is first in queue
-    queueIndex = 0;
+else if (activeTab === "genres") {
+
+  // =========================
+  // GENRE → ALBUMS → SONGS
+  // =========================
+
+  // Find the selected genre
+  const genre =
+    library.genres.find(
+      g =>
+        Number(g.id) ===
+        Number(selectedGenreId)
+    );
+
+  if (!genre) {
+
+    console.error(
+      "Genre not found:",
+      selectedGenreId
+    );
+
+    return;
+  }
 
 
-    console.log(
-      "New queue:",
-      queueSongs
+  // Find albums belonging to this genre
+  const genreAlbums =
+    library.albums.filter(
+      album =>
+        Number(album.genre_id) ===
+        Number(selectedGenreId)
     );
 
 
-    renderQueue();
+  // Get album IDs
+  const genreAlbumIds =
+    genreAlbums.map(
+      album => album.id
+    );
 
 
-    await playSong(song);
+  // Get every song from those albums
+  songsForQueue =
+    library.songs
+      .filter(
+        song =>
+          genreAlbumIds.includes(
+            song.album_id
+          )
+      )
+      .sort((a, b) => {
+
+        // Sort by album
+        if (a.album_id !== b.album_id) {
+          return a.album_id - b.album_id;
+        }
+
+        // Sort tracks inside album
+        return (
+          (a.track_number || 0) -
+          (b.track_number || 0)
+        );
+
+      });
+
+
+  console.log(
+    "Selected genre:",
+    genre.name
+  );
+
+  console.log(
+    "Genre albums:",
+    genreAlbums
+  );
+
+  console.log(
+    "Genre songs:",
+    songsForQueue
+  );
+
+}
+
+
+// =========================
+// FIND CLICKED SONG
+// =========================
+
+const clickedIndex =
+  songsForQueue.findIndex(
+    s =>
+      String(s.id) ===
+      String(song.id)
+  );
+
+
+if (clickedIndex === -1) {
+
+  console.error(
+    "Song not found in playback context:",
+    song.id
+  );
+
+  return;
+
+}
+
+
+// =========================
+// CURRENT SONG + REMAINING
+// =========================
+
+queueSongs =
+  songsForQueue.slice(
+    clickedIndex
+  );
+
+queueIndex = 0;
+
+
+console.log(
+  "Playback context:",
+  activeTab
+);
+
+console.log(
+  "New queue:",
+  queueSongs
+);
+
+
+renderQueue();
+
+await playSong(song);
 
   }
 );
