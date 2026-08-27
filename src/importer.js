@@ -346,7 +346,8 @@ updateAlbumArtwork(
 
     return {
       success: true,
-      songId
+      songId,
+      filePath
     };
 
   } catch (error) {
@@ -418,7 +419,48 @@ async function populateArtistArtwork() {
 }
 
 
-async function scanFolder(folderPath, folderId = null) {
+// =========================
+// COUNT FILES (for progress total)
+// =========================
+
+function countMusicFiles(folderPath) {
+
+  let count = 0;
+
+  const entries = fs.readdirSync(
+    folderPath,
+    { withFileTypes: true }
+  );
+
+  for (const entry of entries) {
+
+    const fullPath = path.join(folderPath, entry.name);
+
+    if (entry.isDirectory()) {
+      count += countMusicFiles(fullPath);
+      continue;
+    }
+
+    if (entry.isFile() && isMusicFile(fullPath)) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
+
+async function scanFolder(
+  folderPath,
+  folderId = null,
+  onProgress = null,
+  counter = { current: 0, total: null }
+) {
+
+  // Only compute the total once, at the top-level call
+  if (counter.total === null) {
+    counter.total = countMusicFiles(folderPath);
+  }
 
   const entries = fs.readdirSync(
     folderPath,
@@ -442,7 +484,9 @@ async function scanFolder(folderPath, folderId = null) {
 
       const result = await scanFolder(
         fullPath,
-        folderId
+        folderId,
+        onProgress,
+        counter
       );
 
       imported.push(...result.imported);
@@ -467,6 +511,17 @@ async function scanFolder(folderPath, folderId = null) {
       fullPath,
       folderId
     );
+
+    counter.current++;
+
+    if (onProgress) {
+      onProgress({
+        current: counter.current,
+        total: counter.total,
+        fileName: path.basename(fullPath),
+        success: result.success
+      });
+    }
 
 
     if (result.success) {

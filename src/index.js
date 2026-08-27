@@ -170,17 +170,13 @@ ipcMain.handle('import-song', async (event, filePath) => {
 ipcMain.handle('import-folder', async (event, folderPath) => {
 
   const folderName = path.basename(folderPath);
+  const folderId = addFolder(folderPath, folderName);
 
-  const folderId = addFolder(
-    folderPath,
-    folderName
-  );
+  const win = BrowserWindow.fromWebContents(event.sender);
 
-  return await scanFolder(
-    folderPath,
-    folderId
-  );
-
+  return await scanFolder(folderPath, folderId, (progress) => {
+    win.webContents.send('import-progress', progress);
+  });
 });
 
 ipcMain.handle("get-library", () => {

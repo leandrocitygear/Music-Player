@@ -112,55 +112,100 @@ let searchQuery = "";
     
     document.body.appendChild(menu);
     
+    function showImportProgressModal() {
+  const modal = document.getElementById("importProgressModal");
+  document.getElementById("importProgressBar").style.width = "0%";
+  document.getElementById("importProgressText").textContent = "Starting...";
+  document.getElementById("importProgressFile").textContent = "";
+  modal.classList.add("visible");
+}
+
+function updateImportProgressModal({ current, total, fileName }) {
+  const percent = total > 0
+    ? Math.round((current / total) * 100)
+    : 0;
+
+  document.getElementById("importProgressBar").style.width = `${percent}%`;
+  document.getElementById("importProgressText").textContent =
+    `${current} / ${total}`;
+  document.getElementById("importProgressFile").textContent = fileName;
+}
+
+function closeImportProgressModal() {
+  document.getElementById("importProgressModal").classList.remove("visible");
+}
+
+function getFileNameFromPath(filePath) {
+  return filePath.split(/[\\/]/).pop();
+}
+
     
     // Add individual files
-    document
-    .getElementById('addMusicFiles')
-    .addEventListener('click', async () => {
-      
-      menu.remove();
-      
-      const files =
-      await window.electronAPI.selectMusicFiles();
-      
-      console.log('Selected files:', files);
-      
-      for (const file of files) {
-        
-        const result =
-        await window.electronAPI.importSong(file);
-        
-        console.log('Imported:', result);
-      }
-      await loadLibrary();
-      
-    });
+   document
+  .getElementById('addMusicFiles')
+  .addEventListener('click', async () => {
+
+    menu.remove();
+
+    const files = await window.electronAPI.selectMusicFiles();
+
+    console.log('Selected files:', files);
+
+    if (!files.length) return;
+
+    showImportProgressModal();
+
+    let current = 0;
+
+    for (const file of files) {
+
+      const result = await window.electronAPI.importSong(file);
+
+      current++;
+
+      updateImportProgressModal({
+        current,
+        total: files.length,
+        fileName: getFileNameFromPath(file)
+      });
+
+      console.log('Imported:', result);
+    }
+
+    closeImportProgressModal();
+
+    await loadLibrary();
+
+  });
     
     
     // Add folder
     document
-    .getElementById('addMusicFolder')
-    .addEventListener('click', async () => {
-      
-          menu.remove();
-          
-          const folder =
-          await window.electronAPI.selectMusicFolder();
-          
-          if (!folder) {
-            return;
-          }
-          
-          console.log('Selected folder:', folder);
-          
-          const result =
-          await window.electronAPI.importFolder(folder);
-          
-          console.log('Folder imported:', result);
-          
-          await loadLibrary();
-          
-        });
+  .getElementById('addMusicFolder')
+  .addEventListener('click', async () => {
+
+    menu.remove();
+
+    const folder = await window.electronAPI.selectMusicFolder();
+
+    if (!folder) return;
+
+    console.log('Selected folder:', folder);
+
+    showImportProgressModal();
+
+    window.electronAPI.onImportProgress(updateImportProgressModal);
+
+    const result = await window.electronAPI.importFolder(folder);
+
+    window.electronAPI.removeImportProgressListener();
+    closeImportProgressModal();
+
+    console.log('Folder imported:', result);
+
+    await loadLibrary();
+
+  });
         
         
         // Close menu when clicking outside
@@ -4524,6 +4569,7 @@ document
     }
   );
 
+  
 
 const musicTabs = document.querySelectorAll('.musicTabs'); 
 

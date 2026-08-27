@@ -136,6 +136,11 @@ selectMusicFolder: () =>
   deletePlaylist: (playlistId) => 
     ipcRenderer.invoke('deletePlaylist', playlistId),
   addSongToPlaylist: (playlistId, songId) => 
-    ipcRenderer.invoke('addSongToPlaylist', playlistId, songId)
+    ipcRenderer.invoke('addSongToPlaylist', playlistId, songId),
+  onImportProgress: (callback) =>
+  ipcRenderer.on('import-progress', (event, data) => callback(data)),
+
+removeImportProgressListener: () =>
+  ipcRenderer.removeAllListeners('import-progress')
       
 });

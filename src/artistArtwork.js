@@ -1,8 +1,9 @@
 const fs = require("fs");
 const path = require("path");
+const { app } = require("electron");
 
 const ARTIST_ARTWORK_DIR = path.join(
-  __dirname,
+  app.getPath("userData"),
   "artist-artwork"
 );
 
