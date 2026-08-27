@@ -585,6 +585,113 @@ function removeSongFromPlaylist(
   };
 }
 
+function deleteSong(songId) {
+
+     const song = db.prepare(`
+        SELECT album_id, artist_id
+        FROM songs
+        WHERE id = ?
+    `).get(songId);
+
+    if (!song) return;
+
+    // 1. Delete the song
+    db.prepare(`
+        DELETE FROM songs
+        WHERE id = ?
+    `).run(songId);
+
+    // 2. Check whether the album still has songs
+    if (song.album_id) {
+        const remainingSongs = db.prepare(`
+            SELECT COUNT(*) AS count
+            FROM songs
+            WHERE album_id = ?
+        `).get(song.album_id);
+
+        if (remainingSongs.count === 0) {
+            db.prepare(`
+                DELETE FROM albums
+                WHERE id = ?
+            `).run(song.album_id);
+        }
+    }
+
+    // 3. Check whether artist still has ANY songs
+    const remainingArtistSongs = db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM songs
+        WHERE artist_id = ?
+    `).get(song.artist_id);
+
+    // 4. Check whether artist still has ANY albums
+    const remainingArtistAlbums = db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM albums
+        WHERE artist_id = ?
+    `).get(song.artist_id);
+
+    // 5. Remove artist if completely unused
+    if (
+        remainingArtistSongs.count === 0 &&
+        remainingArtistAlbums.count === 0
+    ) {
+        db.prepare(`
+            DELETE FROM artists
+            WHERE id = ?
+        `).run(song.artist_id);
+    }
+}
+
+function deleteAlbum(albumId) {
+
+    const album = db.prepare(`
+        SELECT artist_id
+        FROM albums
+        WHERE id = ?
+    `).get(albumId);
+
+    if (!album) return;
+
+    // Delete all songs belonging to album
+    db.prepare(`
+        DELETE FROM songs
+        WHERE album_id = ?
+    `).run(albumId);
+
+    // Delete album
+    db.prepare(`
+        DELETE FROM albums
+        WHERE id = ?
+    `).run(albumId);
+
+    // Check if artist still has songs
+    const remainingSongs = db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM songs
+        WHERE artist_id = ?
+    `).get(album.artist_id);
+
+    // Check if artist still has albums
+    const remainingAlbums = db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM albums
+        WHERE artist_id = ?
+    `).get(album.artist_id);
+
+    // Artist is no longer needed
+    if (
+        remainingSongs.count === 0 &&
+        remainingAlbums.count === 0
+    ) {
+        db.prepare(`
+            DELETE FROM artists
+            WHERE id = ?
+        `).run(album.artist_id);
+    }
+  }
+
+
 module.exports = {
   db,
   getLibrary,
@@ -605,5 +712,7 @@ module.exports = {
   updateArtistArtwork,
   getArtistsWithoutArtwork,
   setSongFavorite,
-  removeSongFromPlaylist
+  removeSongFromPlaylist,
+  deleteAlbum,
+  deleteSong
 };

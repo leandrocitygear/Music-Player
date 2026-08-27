@@ -118,7 +118,10 @@
     
       <div class="dark-overlay2"></div>
     
-    <input id="search"/>
+    <input id="search"
+  type="search"
+  placeholder="Search your music..."
+  autocomplete="off"/>
     <div id="searchButton" class="icons">
       <img src="./icons/search.png" alt="">
     </div>
@@ -333,6 +336,26 @@
     >
       <span>🗑</span>
       <span>Delete Playlist</span>
+    </button>
+
+  </div>
+
+  <!-- QUEUE -->
+  <div class="contextSection" data-menu="queue">
+
+    <button class="contextItem" data-action="remove-queue">
+      <span>🗑</span>
+      <span>Remove from Queue</span>
+    </button>
+
+    <button class="contextItem" data-action="go-album">
+      <span></span>
+      <span>Go to Album</span>
+    </button>
+
+    <button class="contextItem" data-action="go-artist">
+      <span></span>
+      <span>Go to Artist</span>
     </button>
 
   </div>

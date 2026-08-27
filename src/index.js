@@ -18,7 +18,9 @@ const {
   addSong,
   addFolder,
   setSongFavorite,
-  removeSongFromPlaylist
+  removeSongFromPlaylist,
+  deleteAlbum,
+  deleteSong
 } = require("./queries");
 
 const {
@@ -249,6 +251,20 @@ ipcMain.handle(
     );
 
   }
+);
+
+ipcMain.handle(
+    "delete-album",
+    (event, albumId) => {
+        return deleteAlbum(albumId);
+    }
+);
+
+ipcMain.handle(
+    "delete-song",
+    (event, songId) => {
+        return deleteSong(songId);
+    }
 );
 
 // This method will be called when Electron has finishe

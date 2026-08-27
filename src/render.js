@@ -41,6 +41,7 @@ const audio = document.getElementById('myAudio');
 
   let queueSongs = [];
 let queueIndex = -1;
+let searchQuery = "";
 
   
   async function loadLibrary() {
@@ -722,94 +723,390 @@ function renderPlaylistMusic() {
   `;
 }
 
+function normalizeSearchText(value) {
+
+  return String(value || "")
+    .toLowerCase()
+    .trim();
+
+}
+
+
+function matchesSearch(value, query) {
+
+  return normalizeSearchText(value)
+    .includes(query);
+
+}
+
+
+function getSongGenre(song) {
+
+  const album = library.albums.find(
+    album =>
+      Number(album.id) === Number(song.album_id)
+  );
+
+  if (!album) return "";
+
+  const genre = library.genres.find(
+    genre =>
+      Number(genre.id) === Number(album.genre_id)
+  );
+
+  return genre?.name || "";
+
+}
+
+
+function songMatchesSearch(song, query) {
+
+  if (!query) return true;
+
+  const searchableText = [
+
+    song.title,
+
+    song.artist,
+
+    song.album,
+
+    getSongGenre(song)
+
+  ]
+    .map(normalizeSearchText)
+    .join(" ");
+
+  return searchableText.includes(query);
+
+}
 
 
 function renderAlbums() {
-  const results = document.getElementById('results');
+
+  const results =
+    document.getElementById("results");
+
+  let albums = library.albums;
+
+  if (searchQuery) {
+
+    albums = albums.filter(album => {
+
+      const albumSongs =
+        library.songs.filter(
+          song =>
+            Number(song.album_id) ===
+            Number(album.id)
+        );
+
+      const albumGenre =
+        library.genres.find(
+          genre =>
+            Number(genre.id) ===
+            Number(album.genre_id)
+        );
+
+      const albumText = [
+
+        album.title,
+
+        album.artist,
+
+        albumGenre?.name
+
+      ]
+        .map(normalizeSearchText)
+        .join(" ");
+
+      return (
+        albumText.includes(searchQuery) ||
+        albumSongs.some(song =>
+          songMatchesSearch(song, searchQuery)
+        )
+      );
+
+    });
+
+  }
+
+  if (albums.length === 0) {
+
+    results.innerHTML = `
+      <div class="emptyMusicMessage">
+        No albums found
+      </div>
+    `;
+
+    return;
+  }
 
   results.innerHTML = `
     <div id="albumWindow">
-    ${library.albums.map(album => `
-      <div class="musicbox" data-album-id="${album.id}" >
-     <img class="art" src="${album.artwork_path || "./b.jpg"}" />
-     <p class="alb">${album.title}</p>
-     <p class="artistsName">${album.artist || 'Unknown Artist'}</p>
-    </div>
+
+      ${albums.map(album => `
+
+        <div
+          class="musicbox"
+          data-album-id="${album.id}"
+        >
+
+          <img
+            class="art"
+            src="${album.artwork_path || "./b.jpg"}"
+          />
+
+          <p class="alb">
+            ${album.title || "Unknown Album"}
+          </p>
+
+          <p class="artistsName">
+            ${album.artist || "Unknown Artist"}
+          </p>
+
+        </div>
+
       `).join("")}
+
     </div>
-    `
-};
+  `;
+
+}
 
 function renderArtists() {
-  const results = document.getElementById('results');
+
+  const results =
+    document.getElementById("results");
+
+  let artists = library.artists;
+
+  if (searchQuery) {
+
+    artists = artists.filter(artist => {
+
+      if (
+        matchesSearch(
+          artist.name,
+          searchQuery
+        )
+      ) {
+        return true;
+      }
+
+      return library.songs.some(song =>
+        Number(song.artist_id) ===
+          Number(artist.id) &&
+        songMatchesSearch(song, searchQuery)
+      );
+
+    });
+
+  }
+
+  if (artists.length === 0) {
+
+    results.innerHTML = `
+      <div class="emptyMusicMessage">
+        No artists found
+      </div>
+    `;
+
+    return;
+  }
 
   results.innerHTML = `
-  <div id="artistWindow">
-  <div id=artistList>
-  ${library.artists.map(artist => `
-    <div class="artistBox ${artist.id === selectedArtistId ? 'active' : ''}" data-artist-id="${artist.id}" >
-      <img class="artistImg" src="${artist.artwork_path || "./b.jpg" }" />
-      <p class="artistName">${artist.name}</p>
+
+    <div id="artistWindow">
+
+      <div id="artistList">
+
+        ${artists.map(artist => `
+
+          <div
+            class="artistBox ${
+              Number(artist.id) ===
+              Number(selectedArtistId)
+                ? "active"
+                : ""
+            }"
+            data-artist-id="${artist.id}"
+          >
+
+            <img
+              class="artistImg"
+              src="${artist.artwork_path || "./b.jpg"}"
+            />
+
+            <p class="artistName">
+              ${artist.name}
+            </p>
+
+          </div>
+
+        `).join("")}
+
+      </div>
+
+      <div id="artistMusicResults">
+
+        ${renderArtistMusic()}
+
+      </div>
+
     </div>
-    `).join("")}
-    </div>
-    <div id="artistMusicResults">
-    ${renderArtistMusic()}
-    </div>
-    `
-};
+
+  `;
+
+}
 
 function renderSongs() {
-  const results = document.getElementById('results');
 
+  const results =
+    document.getElementById("results");
+
+  let songs = library.songs;
+
+  if (searchQuery) {
+
+    songs = songs.filter(song =>
+      songMatchesSearch(
+        song,
+        searchQuery
+      )
+    );
+
+  }
+
+  if (songs.length === 0) {
+
+    results.innerHTML = `
+      <div class="emptyMusicMessage">
+        No songs found
+      </div>
+    `;
+
+    return;
+  }
 
   results.innerHTML = `
-  <div id="songWindow">
+
+    <div id="songWindow">
 
       <div class="songHeader">
+
         <div class="coverColumn"></div>
-        <div class="titleColumn">TITLE</div>
-        <div class="artistColumn">ARTIST</div>
-        <div class="albumColumn">ALBUM</div>
+
+        <div class="titleColumn">
+          TITLE
+        </div>
+
+        <div class="artistColumn">
+          ARTIST
+        </div>
+
+        <div class="albumColumn">
+          ALBUM
+        </div>
+
       </div>
 
       <div class="songBody">
-  ${library.songs.map(song => `
-    <div class="songRow" 
-    data-song-id="${song.id}">
+
+        ${songs.map(song => `
+
+          <div
+            class="songRow"
+            data-song-id="${song.id}"
+          >
 
             <div class="coverColumn">
+
               <img
                 class="songImg"
                 src="${song.artwork_path || "./b.jpg"}"
               />
+
             </div>
 
             <div class="titleColumn">
-              ${song.title}
+              ${song.title || "Unknown Title"}
             </div>
 
             <div class="artistColumn">
-              ${song.artist || 'Unknown Artist'}
+              ${song.artist || "Unknown Artist"}
             </div>
 
             <div class="albumColumn">
-              ${song.album || 'Unknown Album'}
+              ${song.album || "Unknown Album"}
             </div>
 
           </div>
-    `).join("")}
 
-  </div>
-    `
-    updateActiveSong();
+        `).join("")}
+
+      </div>
+
+    </div>
+
+  `;
+
+  updateActiveSong();
+
 }
 
 function renderGenres() {
 
   const results =
-    document.getElementById('results');
+    document.getElementById("results");
 
+  let genres = library.genres;
+
+  if (searchQuery) {
+
+    genres = genres.filter(genre => {
+
+      if (
+        matchesSearch(
+          genre.name,
+          searchQuery
+        )
+      ) {
+        return true;
+      }
+
+      return library.albums.some(album =>
+
+        Number(album.genre_id) ===
+          Number(genre.id) &&
+
+        (
+          matchesSearch(
+            album.title,
+            searchQuery
+          ) ||
+
+          matchesSearch(
+            album.artist,
+            searchQuery
+          )
+        )
+
+      );
+
+    });
+
+  }
+
+  if (genres.length === 0) {
+
+    results.innerHTML = `
+      <div class="emptyMusicMessage">
+        No genres found
+      </div>
+    `;
+
+    return;
+  }
 
   results.innerHTML = `
 
@@ -817,10 +1114,15 @@ function renderGenres() {
 
       <div id="genreList">
 
-        ${library.genres.map(genre => `
+        ${genres.map(genre => `
 
           <div
-            class="genreBox ${genre.id === selectedGenreId ? 'active' : ''}"
+            class="genreBox ${
+              Number(genre.id) ===
+              Number(selectedGenreId)
+                ? "active"
+                : ""
+            }"
             data-genre-id="${genre.id}"
           >
 
@@ -834,7 +1136,6 @@ function renderGenres() {
 
       </div>
 
-
       <div id="genreMusicResults">
 
         ${renderGenreMusic()}
@@ -846,11 +1147,61 @@ function renderGenres() {
   `;
 
   updateActiveSong();
+
 }
 
 function renderPlaylists() {
-   const results =
-    document.getElementById('results');
+
+  const results =
+    document.getElementById("results");
+
+  let playlists = library.playlists;
+
+  if (searchQuery) {
+
+    playlists = playlists.filter(playlist => {
+
+      if (
+        matchesSearch(
+          playlist.name,
+          searchQuery
+        )
+      ) {
+        return true;
+      }
+
+      const songs =
+        playlist.song_ids
+          .map(songId =>
+            library.songs.find(
+              song =>
+                Number(song.id) ===
+                Number(songId)
+            )
+          )
+          .filter(Boolean);
+
+      return songs.some(song =>
+        songMatchesSearch(
+          song,
+          searchQuery
+        )
+      );
+
+    });
+
+  }
+
+  if (playlists.length === 0) {
+
+    results.innerHTML = `
+      <div class="emptyMusicMessage">
+        No playlists found
+      </div>
+    `;
+
+    return;
+  }
 
   results.innerHTML = `
 
@@ -858,7 +1209,24 @@ function renderPlaylists() {
 
       <div id="playlistList">
 
-        ${library.playlists.map(playlist => `
+        <div id="addNewPlaylistBtn">
+
+          <button
+            class="contextItem"
+            data-action="play"
+          >
+
+            <span></span>
+
+            <span>
+              Create New Playlist
+            </span>
+
+          </button>
+
+        </div>
+
+        ${playlists.map(playlist => `
 
           <div
             class="playlistBox ${
@@ -891,71 +1259,274 @@ function renderPlaylists() {
   `;
 
   updateActiveSong();
+
+}
+
+let draggedQueueIndex = null;
+let originalQueueOrder = [];
+
+function setupQueueDragAndDrop() {
+
+  const queueItems =
+    document.querySelectorAll(".queueSong");
+
+  queueItems.forEach(item => {
+
+    item.addEventListener("dragstart", event => {
+
+      draggedQueueIndex =
+        Number(item.dataset.queueIndex);
+
+      item.classList.add("dragging");
+
+      event.dataTransfer.effectAllowed = "move";
+
+    });
+
+
+    item.addEventListener("dragend", () => {
+
+      item.classList.remove("dragging");
+
+      draggedQueueIndex = null;
+
+      document
+        .querySelectorAll(".queueSong")
+        .forEach(song => {
+          song.classList.remove("drag-over");
+        });
+
+    });
+
+
+    item.addEventListener("dragover", event => {
+
+      event.preventDefault();
+
+      if (draggedQueueIndex === null) {
+        return;
+      }
+
+      const targetIndex =
+        Number(item.dataset.queueIndex);
+
+      if (targetIndex === draggedQueueIndex) {
+        return;
+      }
+
+      document
+        .querySelectorAll(".queueSong")
+        .forEach(song => {
+          song.classList.remove("drag-over");
+        });
+
+      item.classList.add("drag-over");
+
+    });
+
+
+    item.addEventListener("drop", event => {
+
+      event.preventDefault();
+
+      const targetIndex =
+        Number(item.dataset.queueIndex);
+
+      if (draggedQueueIndex === null) {
+        return;
+      }
+
+      if (draggedQueueIndex === targetIndex) {
+        return;
+      }
+
+      reorderQueue(
+        draggedQueueIndex,
+        targetIndex
+      );
+
+    });
+
+  });
+
 }
 
 
 function renderQueue() {
 
-  const queueList =
-    document.getElementById("queueList");
+  const queueList = document.getElementById("queueList");
 
   if (!queueList) return;
 
   if (queueSongs.length === 0) {
-
     queueList.innerHTML = `
       <div class="emptyQueue">
         <p>Your queue is empty</p>
       </div>
     `;
-
     return;
   }
 
-  queueList.innerHTML = queueSongs.map((song, index) => {
+  if (currentSong) {
+    const currentIndex = queueSongs.findIndex(
+      song => String(song.id) === String(currentSong.id)
+    );
+    queueIndex = currentIndex;
+  } else {
+    queueIndex = -1;
+  }
 
-    // Check if this is the currently playing song
-    const isActive =
-      currentSong &&
-      String(song.id) === String(currentSong.id);
-
-    return `
-      <div
-        class="queueSong ${isActive ? "active" : ""}"
-        data-queue-index="${index}"
-        data-song-id="${song.id}"
-      >
-
-        <img
-          class="queueArt"
-          src="${song.artwork_path || "./icons/album.png"}"
-          alt=""
-        >
-
-        <div class="queueSongInfo">
-
-          <p class="queueSongTitle">
-            ${song.title || "Unknown Title"}
-          </p>
-
-          <p class="queueAlb">
-            ${song.album || "Unknown Album"}
-          </p>
-
-          <p class="queueArtistsName">
-            ${song.artist || "Unknown Artist"}
-          </p>
-
-        </div>
-
-        <div class="queueSongDuration">
-          ${formatTime(song.duration)}
-        </div>
-
+  const renderSongRow = (song, index, isActive) => `
+    <div
+      class="queueSong ${isActive ? "active" : ""}"
+      data-queue-index="${index}"
+      data-song-id="${song.id}"
+      draggable="${isActive ? "false" : "true"}"
+    >
+      <img class="queueArt" src="${song.artwork_path || "./icons/album.png"}" alt="">
+      <div class="queueSongInfo">
+        <p class="queueSongTitle">${song.title || "Unknown Title"}</p>
+        <p class="queueAlb">${song.album || "Unknown Album"}</p>
+        <p class="queueArtistsName">${song.artist || "Unknown Artist"}</p>
       </div>
-    `;
+      <div class="queueSongDuration">${formatTime(song.duration)}</div>
+    </div>
+  `;
 
-  }).join("");
+  let html = "";
+
+  if (currentSong && queueIndex !== -1) {
+    html += `
+      <div class="queueSectionLabel">Now Playing</div>
+      ${renderSongRow(currentSong, queueIndex, true)}
+    `;
+  }
+
+  // Only songs AFTER the current index — already-played songs stay hidden
+  const upNext = queueSongs
+    .map((song, index) => ({ song, index }))
+    .filter(({ index }) => index > queueIndex);
+
+  if (upNext.length > 0) {
+    html += `<div class="queueSectionLabel">Next Up</div>`;
+    html += upNext
+      .map(({ song, index }) => renderSongRow(song, index, false))
+      .join("");
+  }
+
+  queueList.innerHTML = html;
+
+  setupQueueDragAndDrop();
+
+  scrollToCurrentQueueSong();
+}
+
+function reorderQueue(fromIndex, toIndex) {
+
+  if (
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= queueSongs.length ||
+    toIndex >= queueSongs.length
+  ) {
+    return;
+  }
+
+  const currentSongId =
+    currentSong
+      ? currentSong.id
+      : null;
+
+
+  const [movedSong] =
+    queueSongs.splice(fromIndex, 1);
+
+
+  // Account for the index shifting
+  // when an item is moved downward.
+  let newIndex = toIndex;
+
+  if (fromIndex < toIndex) {
+    newIndex--;
+  }
+
+
+  queueSongs.splice(
+    newIndex,
+    0,
+    movedSong
+  );
+
+
+  // Find the current song again.
+  // This prevents queueIndex from becoming wrong.
+  if (currentSongId !== null) {
+
+    queueIndex =
+      queueSongs.findIndex(
+        song =>
+          String(song.id) ===
+          String(currentSongId)
+      );
+
+  }
+
+
+  renderQueue();
+
+}
+
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function shuffleQueue() {
+
+  originalQueueOrder = [...queueSongs];
+
+  if (!currentSong) {
+    queueSongs = shuffleArray(queueSongs);
+    renderQueue();
+    return;
+  }
+
+  const currentIndex = queueSongs.findIndex(
+    song => String(song.id) === String(currentSong.id)
+  );
+
+  // Keep played history + current song exactly where they are,
+  // only shuffle what's still upcoming
+  const played = queueSongs.slice(0, currentIndex);
+  const current = queueSongs[currentIndex];
+  const upcoming = queueSongs.slice(currentIndex + 1);
+
+  const shuffledUpcoming = shuffleArray(upcoming);
+
+  queueSongs = [...played, current, ...shuffledUpcoming];
+  queueIndex = currentIndex;
+
+  renderQueue();
+}
+
+function unshuffleQueue() {
+
+  if (originalQueueOrder.length === 0) return;
+
+  const currentIndex = originalQueueOrder.findIndex(
+    song => currentSong && String(song.id) === String(currentSong.id)
+  );
+
+  queueSongs = [...originalQueueOrder];
+  queueIndex = currentIndex;
+
+  originalQueueOrder = [];
+
+  renderQueue();
 }
 
 document
@@ -993,37 +1564,102 @@ document
     renderQueue();
   });
   
-  function addToQueue(song) {
+function addToQueue(song) {
 
   if (!song) return;
 
-  // Don't add the current song
-  if (currentSong && song.id === currentSong.id) {
+
+  // Current song doesn't need to be
+  // added to the queue.
+  if (
+    currentSong &&
+    String(song.id) ===
+    String(currentSong.id)
+  ) {
     return;
   }
 
-  // Don't add duplicates
-  if (queueSongs.some(s => s.id === song.id)) {
+
+  // Don't add duplicates.
+  if (
+    queueSongs.some(
+      s =>
+        String(s.id) ===
+        String(song.id)
+    )
+  ) {
     return;
   }
+
 
   queueSongs.push(song);
 
   renderQueue();
 
-  console.log("Added to queue:", song.title);
+  console.log(
+    "Added to queue:",
+    song.title
+  );
+
 }
 
 function removeFromQueue(index) {
-  if (index < 0 || index >= queueSongs.length) {
+
+  if (
+    index < 0 ||
+    index >= queueSongs.length
+  ) {
     return;
   }
 
-  const removedSong = queueSongs.splice(index, 1)[0];
+
+  const removedSong =
+    queueSongs[index];
+
+
+  // Never allow the currently playing
+  // song to be removed this way.
+  if (
+    currentSong &&
+    String(removedSong.id) ===
+    String(currentSong.id)
+  ) {
+
+    console.log(
+      "Cannot remove the currently playing song."
+    );
+
+    return;
+
+  }
+
+
+  queueSongs.splice(
+    index,
+    1
+  );
+
+
+  // Recalculate current position.
+  if (currentSong) {
+
+    queueIndex =
+      queueSongs.findIndex(
+        song =>
+          String(song.id) ===
+          String(currentSong.id)
+      );
+
+  }
+
 
   renderQueue();
 
-  console.log("Removed from queue:", removedSong.title);
+  console.log(
+    "Removed from queue:",
+    removedSong.title
+  );
+
 }
 
 function playQueue(songs, startIndex = 0) {
@@ -1064,6 +1700,27 @@ function clearQueue() {
 
   renderQueue();
 console.log("Queue cleared");
+}
+
+function scrollToCurrentQueueSong() {
+
+  if (!currentSong) return;
+
+
+  const currentQueueSong =
+    document.querySelector(
+      `.queueSong[data-song-id="${currentSong.id}"]`
+    );
+
+
+  if (!currentQueueSong) return;
+
+
+  currentQueueSong.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
 }
 
 document
@@ -1260,9 +1917,11 @@ async function playSong(song) {
     );
 
   // Find song inside queue
-  const indexInQueue =
+const indexInQueue =
     queueSongs.findIndex(
-      s => s.id === song.id
+      s =>
+        String(s.id) ===
+        String(song.id)
     );
 
   if (indexInQueue !== -1) {
@@ -1499,62 +2158,26 @@ document
 
   });
 
-  function playPreviousSong() {
-
+function playPreviousSong() {
   if (!currentSong) return;
 
-
-  // If no queue, use library
   if (queueSongs.length === 0) {
-
     playLibraryPreviousSong();
-
     return;
   }
 
-
-  let previousIndex;
-
-
-  if (isShuffle) {
-
-    previousIndex =
-      Math.floor(
-        Math.random() * queueSongs.length
-      );
-
-  } else {
-
-    previousIndex =
-      queueIndex - 1;
-
-  }
-
+  let previousIndex = queueIndex - 1;   // no more isShuffle branch
 
   if (previousIndex < 0) {
-
     if (repeatMode === "all") {
-
-      previousIndex =
-        queueSongs.length - 1;
-
+      previousIndex = queueSongs.length - 1;
     } else {
-
       previousIndex = 0;
-
     }
-
   }
 
-
   queueIndex = previousIndex;
-
-  renderQueue();
-
-  playSong(
-    queueSongs[queueIndex]
-  );
-
+  playSong(queueSongs[queueIndex]);
 }
 
 function playLibraryNextSong() {
@@ -1599,90 +2222,37 @@ document
 
   });
 
-  function playNextSong() {
+function playNextSong() {
   if (!currentSong) return;
 
-  // =========================
-  // REPEAT ONE
-  // =========================
-
   if (repeatMode === "one") {
-
     audio.currentTime = 0;
-
     audio.play();
-
     return;
   }
-
-
-  // =========================
-  // NO QUEUE
-  // =========================
 
   if (queueSongs.length === 0) {
-
     playLibraryNextSong();
-
     return;
   }
 
-
-  // =========================
-  // NEXT QUEUE SONG
-  // =========================
-
-  let nextIndex;
-
-
-  if (isShuffle) {
-
-    nextIndex =
-      Math.floor(
-        Math.random() * queueSongs.length
-      );
-
-  } else {
-
-    nextIndex =
-      queueIndex + 1;
-
-  }
-
-
-  // =========================
-  // END OF QUEUE
-  // =========================
+  let nextIndex = queueIndex + 1;   // no more isShuffle branch
 
   if (nextIndex >= queueSongs.length) {
-
     if (repeatMode === "all") {
-
       nextIndex = 0;
-
     } else {
-
       audio.pause();
-
       queueIndex = queueSongs.length - 1;
-
       renderQueue();
       updateActiveSong();
       updatePlayButton();
-
       return;
     }
   }
 
-
   queueIndex = nextIndex;
-
-  renderQueue();
-
-  playSong(
-    queueSongs[queueIndex]
-  );
-
+  playSong(queueSongs[queueIndex]);
 }
 
 
@@ -1734,6 +2304,12 @@ document
         "active",
         isShuffle
       );
+
+       if (isShuffle) {
+    shuffleQueue();
+  } else {
+    unshuffleQueue();
+  }
 
 
     console.log(
@@ -1940,9 +2516,9 @@ function playArtistSong(song) {
     s => s.id === song.id
   );
 
-  queueSongs = artistSongs.slice(clickedIndex);
+  queueSongs = [...artistSongs];
 
-  queueIndex = 0;
+  queueIndex = clickedIndex;
 
   renderQueue();
 
@@ -1957,9 +2533,9 @@ function playAllSongs(song) {
     s => s.id === song.id
   );
 
-  queueSongs = allSongs.slice(clickedIndex);
+  queueSongs = [...allSongs];
 
-  queueIndex = 0;
+  queueIndex = clickedIndex;
 
   renderQueue();
 
@@ -2004,9 +2580,9 @@ function playGenreSong(song, genreId) {
   }
 
   // Start queue at clicked song
-  queueSongs = genreSongs.slice(clickedIndex);
+  queueSongs = [...genreSongs];
 
-  queueIndex = 0;
+  queueIndex = clickedIndex;
 
   renderQueue();
 
@@ -2158,6 +2734,8 @@ volumeSlider.addEventListener("input", () => {
     Number(volumeSlider.value);
 
 });
+
+
 
 
 
@@ -2345,6 +2923,30 @@ document.addEventListener(
   event => {
 
     // ==========================================
+  // QUEUE SONG
+  // ==========================================
+
+  const queueSongElement =
+    event.target.closest(".queueSong");
+
+  if (queueSongElement) {
+
+    const songId =
+      queueSongElement.dataset.songId;
+
+    const song =
+      queueSongs.find(
+        s => String(s.id) === String(songId)
+      );
+
+    if (!song) return;
+
+    showContextMenu(event, "queue", song);
+
+    return;
+  }
+
+    // ==========================================
     // SONG
     // ==========================================
 
@@ -2523,6 +3125,8 @@ window.addEventListener(
 contextMenu.addEventListener(
   "click",
   async event => {
+
+    event.stopPropagation();
 
     const item =
       event.target.closest(
@@ -2736,6 +3340,22 @@ contextMenu.addEventListener(
       return;
     }
 
+    // =================================================
+    // QUEUE
+    // =================================================
+
+    if (action === "remove-queue") {
+
+      const index =
+        queueSongs.findIndex(
+          s => String(s.id) === String(target.id)
+        );
+
+      removeFromQueue(index);
+
+      return;
+    }
+
   }
 );
 
@@ -2744,32 +3364,77 @@ function playNextSongContext(song) {
   if (!song) return;
 
 
-  // If nothing is currently playing
+  // If nothing is currently playing,
+  // just start the song.
   if (!currentSong) {
 
     playSong(song);
 
     return;
+
   }
 
 
-  const index =
-    queueIndex + 1;
+  // Don't add the current song.
+  if (
+    String(song.id) ===
+    String(currentSong.id)
+  ) {
+    return;
+  }
+
+
+  // Don't duplicate a song already in queue.
+  const existingIndex =
+    queueSongs.findIndex(
+      s =>
+        String(s.id) ===
+        String(song.id)
+    );
+
+  if (existingIndex !== -1) {
+
+    queueSongs.splice(
+      existingIndex,
+      1
+    );
+
+  }
+
+
+  // Find the current song's REAL position.
+  const currentIndex =
+    queueSongs.findIndex(
+      s =>
+        String(s.id) ===
+        String(currentSong.id)
+    );
+
+
+  const insertIndex =
+    currentIndex === -1
+      ? 0
+      : currentIndex + 1;
 
 
   queueSongs.splice(
-    index,
+    insertIndex,
     0,
     song
   );
 
 
+  queueIndex =
+    currentIndex;
+
+
   renderQueue();
 
   console.log(
-    "Added song to play next:",
+    "Playing next:",
     song.title
   );
+
 }
 
 function getAlbumSongs(album) {
@@ -2968,6 +3633,35 @@ function getArtistSongs(artist) {
     });
 }
 
+function goToAlbumArtist(album) {
+    if (!album) return;
+
+    selectedArtistId = Number(album.artist_id);
+
+    activeTab = "artists";
+
+    musicTabs.forEach(tab => {
+        tab.classList.remove("active");
+    });
+
+    const artistsTab =
+        document.getElementById("artists");
+
+    artistsTab.classList.add("active");
+
+    renderCurrentView();
+
+    const artistMusicResults =
+        document.getElementById("artistMusicResults");
+
+    if (artistMusicResults) {
+        artistMusicResults.innerHTML =
+            renderArtistMusic();
+    }
+
+    updateActiveSong();
+}
+
 
 function playArtistContext(artist) {
 
@@ -3112,6 +3806,9 @@ function goToAlbum(song) {
       "active"
     );
 
+    // Open the navigation panel
+  navigation.style.display = "block";
+
 
   renderCurrentView();
 
@@ -3169,6 +3866,9 @@ function goToArtist(song) {
     ?.classList.add(
       "active"
     );
+
+    // Open the navigation panel
+  navigation.style.display = "block";
 
 
   renderCurrentView();
@@ -3455,30 +4155,60 @@ async function deleteSong(song) {
 
     // Remove from queue
     queueSongs =
-      queueSongs.filter(
-        s => s.id !== song.id
-      );
+  queueSongs.filter(
+    s =>
+      String(s.id) !==
+      String(song.id)
+  );
 
 
     // If currently playing
-    if (
-      currentSong &&
-      currentSong.id === song.id
-    ) {
+    const wasPlaying =
+  currentSong &&
+  String(currentSong.id) ===
+  String(song.id);
 
-      audio.pause();
 
-      currentSong = null;
+if (wasPlaying) {
 
-      audio.src = "";
+  audio.pause();
 
-      updatePlayButton();
-    }
+  currentSong = null;
 
+  audio.src = "";
+
+  queueIndex = -1;
+
+}
 
     await loadLibrary();
 
+   if (wasPlaying) {
+
+  if (queueSongs.length > 0) {
+
+    // The queue has already had the
+    // deleted song removed.
+
+    queueIndex = 0;
+
+    await playSong(
+      queueSongs[0]
+    );
+
+  } else {
+
     renderQueue();
+
+    updatePlayButton();
+
+  }
+
+} else {
+
+  renderQueue();
+
+}
 
 
   } catch (error) {
@@ -3658,6 +4388,16 @@ musicTabs.forEach(tab => {
     
     renderCurrentView();
   });
+});
+
+const searchInput = document.getElementById("search");
+
+searchInput.addEventListener("input", () => {
+
+  searchQuery = searchInput.value.trim().toLowerCase();
+
+  renderCurrentView();
+
 });
 
 
@@ -4174,12 +4914,9 @@ if (clickedIndex === -1) {
 // CURRENT SONG + REMAINING
 // =========================
 
-queueSongs =
-  songsForQueue.slice(
-    clickedIndex
-  );
+queueSongs = [...songsForQueue]
 
-queueIndex = 0;
+queueIndex = clickedIndex;
 
 
 console.log(

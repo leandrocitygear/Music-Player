@@ -110,6 +110,18 @@ selectMusicFolder: () =>
     "remove-song-from-playlist",
     playlistId,
     songId
-  )
+  ),
+
+  deleteAlbum: (albumId) =>
+    ipcRenderer.invoke(
+        "delete-album",
+        albumId
+    ),
+
+  deleteSong: (songId) =>
+    ipcRenderer.invoke(
+        "delete-song",
+        songId
+    )
       
 });

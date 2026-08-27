@@ -1327,3 +1327,21 @@ background: rgba(255, 255, 255, 0.1);
     background:
         rgba(255, 255, 255, 0.1);
 }
+
+
+.queueSong {
+  cursor: grab;
+  user-select: none;
+}
+
+.queueSong:active {
+  cursor: grabbing;
+}
+
+.queueSong.dragging {
+  opacity: 0.45;
+}
+
+.queueSong.drag-over {
+  border-top: 2px solid white;
+}
