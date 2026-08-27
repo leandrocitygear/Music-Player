@@ -20,7 +20,10 @@ const {
   setSongFavorite,
   removeSongFromPlaylist,
   deleteAlbum,
-  deleteSong
+  deleteSong,
+  createPlaylist,
+  addSongToPlaylist,
+  deletePlaylist
 } = require("./queries");
 
 const {
@@ -266,6 +269,39 @@ ipcMain.handle(
         return deleteSong(songId);
     }
 );
+
+ipcMain.handle(
+  "create-playlist",
+  (event, name, description) => {
+
+    return createPlaylist(
+      name,
+      description
+    );
+
+  }
+);
+
+
+// Delete playlist
+ipcMain.handle('deletePlaylist', async (event, playlistId) => {
+  try {
+    return deletePlaylist(playlistId);
+  } catch (error) {
+    console.error('Error deleting playlist:', error);
+    throw error;
+  }
+});
+
+// Add song to playlist
+ipcMain.handle('addSongToPlaylist', async (event, playlistId, songId) => {
+  try {
+    return addSongToPlaylist(playlistId, songId);
+  } catch (error) {
+    console.error('Error adding song to playlist:', error);
+    throw error;
+  }
+});
 
 // This method will be called when Electron has finishe
 // initialization and is ready to create browser windo.

@@ -1345,3 +1345,211 @@ background: rgba(255, 255, 255, 0.1);
 .queueSong.drag-over {
   border-top: 2px solid white;
 }
+
+#createPlaylistModal {
+
+  position: fixed;
+
+  inset: 0;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  z-index: 1000;
+
+}
+
+#createPlaylistModal.visible {
+  display: flex;
+}
+
+
+.createPlaylistWindow {
+  width: 420px;
+
+  background: rgba(25, 25, 25, 0.96);
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5);
+
+  overflow: hidden;
+
+}
+
+
+.createPlaylistHeader {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 20px;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.1);
+
+}
+
+
+.createPlaylistClose {
+
+  border: none;
+
+  background: transparent;
+
+  color: white;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  opacity: 0.7;
+}
+
+.createPlaylistClose:hover {
+  opacity: 1;
+}
+
+
+.createPlaylistBody {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding: 20px;
+
+}
+
+
+.createPlaylistBody label {
+
+  font-size: 13px;
+
+  opacity: 0.7;
+
+  margin-top: 8px;
+
+}
+
+
+.createPlaylistBody input,
+.createPlaylistBody textarea {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.15);
+
+  border-radius: 7px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: white;
+
+  padding: 10px 12px;
+
+  outline: none;
+
+  font-family: inherit;
+
+}
+
+
+.createPlaylistBody input:focus,
+.createPlaylistBody textarea:focus {
+
+  border-color:
+    rgba(255, 255, 255, 0.4);
+
+}
+
+
+.createPlaylistBody textarea {
+
+  height: 90px;
+
+  resize: none;
+
+}
+
+
+.createPlaylistFooter {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding: 15px 20px;
+
+  border-top: 1px solid
+    rgba(255, 255, 255, 0.1);
+
+}
+
+
+.playlistCancelBtn,
+.playlistCreateBtn {
+
+  border: none;
+
+  border-radius: 7px;
+
+  padding: 9px 16px;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+}
+
+
+.playlistCancelBtn {
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+
+}
+
+
+.playlistCreateBtn {
+
+  background: white;
+
+  color: black;
+
+  font-weight: 600;
+
+}
+
+
+.createPlaylistError {
+
+  min-height: 18px;
+
+  color: #ff6b6b;
+
+  font-size: 13px;
+
+  margin-top: 5px;
+
+}

@@ -325,11 +325,6 @@
 
     <div class="contextDivider"></div>
 
-    <button class="contextItem" data-action="rename-playlist">
-      <span>✏️</span>
-      <span>Rename</span>
-    </button>
-
     <button
       class="contextItem danger"
       data-action="delete-playlist"
@@ -364,11 +359,89 @@
 
 <div id="playlistPicker" class="playlistPicker">
 
+  <button
+        id="closePlaylistPicker"
+        class="PlaylistPickerClose"
+      >
+        ×
+    </button>
+    
+
   <div class="playlistPickerHeader">
     Add to Playlist
   </div>
 
   <div id="playlistPickerList"></div>
+
+</div>
+
+<div id="createPlaylistModal" class="createPlaylistModal">
+
+  <div class="createPlaylistWindow">
+
+    <div class="createPlaylistHeader">
+      <span>Create Playlist</span>
+
+      <button
+        id="closeCreatePlaylist"
+        class="createPlaylistClose"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="createPlaylistBody">
+
+      <label for="playlistNameInput">
+        Playlist Name
+      </label>
+
+      <input
+        type="text"
+        id="playlistNameInput"
+        placeholder="My Playlist"
+        maxlength="100"
+        autocomplete="off"
+      >
+
+      <label for="playlistDescriptionInput">
+        Description
+      </label>
+
+      <textarea
+        id="playlistDescriptionInput"
+        placeholder="Optional"
+        maxlength="500"
+      ></textarea>
+
+      <div
+        id="createPlaylistError"
+        class="createPlaylistError"
+      ></div>
+
+    </div>
+
+    <div class="createPlaylistFooter">
+
+      <button
+        id="cancelCreatePlaylist"
+        class="playlistCancelBtn"
+      >
+        Cancel
+      </button>
+
+      <button
+        id="confirmCreatePlaylist"
+        class="playlistCreateBtn"
+      >
+        Create
+      </button>
+
+    </div>
+
+  </div>
+
+  
 
 </div>
 

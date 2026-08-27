@@ -692,6 +692,133 @@ function deleteAlbum(albumId) {
   }
 
 
+
+
+function createPlaylist(name, description = null) {
+
+  name = name.trim();
+
+  if (!name) {
+    throw new Error("Playlist name cannot be empty");
+  }
+
+  const existing = db.prepare(`
+    SELECT id
+    FROM playlists
+    WHERE name = ?
+  `).get(name);
+
+  if (existing) {
+    throw new Error("A playlist with this name already exists");
+  }
+
+  const result = db.prepare(`
+    INSERT INTO playlists (
+      name,
+      description
+    )
+    VALUES (?, ?)
+  `).run(
+    name,
+    description || null
+  );
+
+  return db.prepare(`
+    SELECT *
+    FROM playlists
+    WHERE id = ?
+  `).get(result.lastInsertRowid);
+}
+
+function addSongToPlaylist(playlistId, songId) {
+  
+  // Check if playlist exists
+  const playlist = db.prepare(`
+    SELECT id
+    FROM playlists
+    WHERE id = ?
+  `).get(playlistId);
+
+  if (!playlist) {
+    throw new Error("Playlist not found");
+  }
+
+  // Check if song exists
+  const song = db.prepare(`
+    SELECT id
+    FROM songs
+    WHERE id = ?
+  `).get(songId);
+
+  if (!song) {
+    throw new Error("Song not found");
+  }
+
+  // Check if song is already in playlist
+  const existing = db.prepare(`
+    SELECT 1
+    FROM playlist_songs
+    WHERE playlist_id = ?
+      AND song_id = ?
+  `).get(playlistId, songId);
+
+  if (existing) {
+    return { success: true, alreadyExists: true };
+  }
+
+  // Get the next position
+  const result = db.prepare(`
+    SELECT COALESCE(MAX(position), 0) + 1 AS nextPosition
+    FROM playlist_songs
+    WHERE playlist_id = ?
+  `).get(playlistId);
+
+  // Add song to playlist
+  db.prepare(`
+    INSERT INTO playlist_songs (
+      playlist_id,
+      song_id,
+      position
+    )
+    VALUES (?, ?, ?)
+  `).run(
+    playlistId,
+    songId,
+    result.nextPosition
+  );
+
+  return { success: true };
+}
+
+
+function deletePlaylist(playlistId) {
+  
+  // Check if playlist exists
+  const playlist = db.prepare(`
+    SELECT id, name
+    FROM playlists
+    WHERE id = ?
+  `).get(playlistId);
+
+  if (!playlist) {
+    throw new Error("Playlist not found");
+  }
+
+  // Don't allow deleting Favorites playlist
+  if (playlist.name === 'Favorites') {
+    throw new Error("The Favorites playlist cannot be deleted");
+  }
+
+  // Delete playlist (this will cascade to playlist_songs)
+  db.prepare(`
+    DELETE FROM playlists
+    WHERE id = ?
+  `).run(playlistId);
+
+  return { success: true };
+}
+
+
 module.exports = {
   db,
   getLibrary,
@@ -714,5 +841,8 @@ module.exports = {
   setSongFavorite,
   removeSongFromPlaylist,
   deleteAlbum,
-  deleteSong
+  deleteSong,
+  createPlaylist,
+  addSongToPlaylist,
+  deletePlaylist
 };

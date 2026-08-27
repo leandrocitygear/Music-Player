@@ -1192,16 +1192,56 @@ function renderPlaylists() {
 
   }
 
+  // =========================
+  // NO PLAYLISTS
+  // =========================
+
   if (playlists.length === 0) {
 
     results.innerHTML = `
-      <div class="emptyMusicMessage">
-        No playlists found
+
+      <div id="playlistWindow">
+
+        <div id="playlistList">
+
+          <div id="addNewPlaylistBtn">
+
+            <button
+              class="contextItem"
+              data-action="create-playlist"
+              id="createPlaylistBtn"
+            >
+
+              <span>＋</span>
+
+              <span>
+                Create New Playlist
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+        <div id="playlistMusicResults">
+
+          <div class="emptyMusicMessage">
+            No playlists found
+          </div>
+
+        </div>
+
       </div>
+
     `;
 
     return;
   }
+
+  // =========================
+  // PLAYLISTS
+  // =========================
 
   results.innerHTML = `
 
@@ -1213,10 +1253,11 @@ function renderPlaylists() {
 
           <button
             class="contextItem"
-            data-action="play"
+            data-action="create-playlist"
+            id="createPlaylistBtn"
           >
 
-            <span></span>
+            <span>＋</span>
 
             <span>
               Create New Playlist
@@ -3325,20 +3366,18 @@ contextMenu.addEventListener(
     }
 
 
-    if (action === "rename-playlist") {
-
-      await renamePlaylist(target);
-
-      return;
-    }
-
-
     if (action === "delete-playlist") {
 
       await deletePlaylist(target);
 
       return;
     }
+
+    if (action === "create-playlist") {
+
+  openCreatePlaylistModal();
+
+}
 
     // =================================================
     // QUEUE
@@ -4281,44 +4320,6 @@ async function deleteAlbum(album) {
   }
 }
 
-async function renamePlaylist(
-  playlist
-) {
-
-  const newName =
-    prompt(
-      "Enter a new playlist name:",
-      playlist.name
-    );
-
-
-  if (
-    !newName ||
-    !newName.trim()
-  ) {
-    return;
-  }
-
-
-  try {
-
-    await window.electronAPI.renamePlaylist(
-      playlist.id,
-      newName.trim()
-    );
-
-
-    await loadLibrary();
-
-  } catch (error) {
-
-    console.error(
-      "Failed to rename playlist:",
-      error
-    );
-  }
-}
-
 async function deletePlaylist(
   playlist
 ) {
@@ -4373,6 +4374,156 @@ async function deletePlaylist(
   }
 }
 
+function openCreatePlaylistModal() {
+  console.log("Opening create playlist modal");
+  
+  const modal = document.getElementById("createPlaylistModal");
+  
+  if (!modal) {
+    console.error("Create playlist modal not found!");
+    return;
+  }
+  
+  const nameInput = document.getElementById("playlistNameInput");
+  const descriptionInput = document.getElementById("playlistDescriptionInput");
+  const error = document.getElementById("createPlaylistError");
+  
+  if (!nameInput || !descriptionInput || !error) {
+    console.error("Modal elements not found!");
+    return;
+  }
+  
+  nameInput.value = "";
+  descriptionInput.value = "";
+  error.textContent = "";
+  
+  modal.classList.add("visible");
+  
+  console.log("Modal should be visible now");
+  
+  setTimeout(() => {
+    nameInput.focus();
+  }, 50);
+}
+
+function closeCreatePlaylistModal() {
+
+  const modal =
+    document.getElementById(
+      "createPlaylistModal"
+    );
+
+  modal.classList.remove("visible");
+
+}
+function closePlaylistPicker() {
+
+   playlistPicker.style.display = "none";
+
+}
+
+async function handleCreatePlaylist() {
+  console.log("Creating playlist...");
+  
+  const nameInput = document.getElementById("playlistNameInput");
+  const descriptionInput = document.getElementById("playlistDescriptionInput");
+  const error = document.getElementById("createPlaylistError");
+  
+  if (!nameInput || !descriptionInput || !error) {
+    console.error("Form elements not found!");
+    return;
+  }
+  
+  const name = nameInput.value.trim();
+  const description = descriptionInput.value.trim();
+  
+  error.textContent = "";
+  
+  if (!name) {
+    error.textContent = "Please enter a playlist name.";
+    nameInput.focus();
+    return;
+  }
+  
+  try {
+    const playlist = await window.electronAPI.createPlaylist(
+      name,
+      description || null
+    );
+    
+    console.log("Playlist created:", playlist);
+    
+    // Add it to our current library
+    library.playlists.push({
+      ...playlist,
+      song_ids: []
+    });
+    
+    // Select the new playlist
+    selectedPlaylistId = playlist.id;
+    
+    // Close modal
+    closeCreatePlaylistModal();
+    
+    // Render playlists again
+    renderPlaylists();
+    
+  } catch (error) {
+    console.error("Failed to create playlist:", error);
+    error.textContent = error.message || "Failed to create playlist.";
+  }
+}
+
+document
+  .getElementById("closeCreatePlaylist")
+  .addEventListener(
+    "click", (event) => {
+      event.stopPropagation();
+      closeCreatePlaylistModal();
+    }
+  );
+
+document
+  .getElementById("closePlaylistPicker")
+  .addEventListener("click", (event) => {
+    event.stopPropagation();
+    closePlaylistPicker();
+  });
+
+document
+  .getElementById("cancelCreatePlaylist")
+  .addEventListener(
+    "click", (event) => {
+      event.stopPropagation();
+      closeCreatePlaylistModal();
+    }
+  );
+
+document
+  .getElementById("confirmCreatePlaylist")
+  .addEventListener(
+    "click", (event) => {
+      event.stopPropagation();
+      handleCreatePlaylist();
+    }
+  );
+
+document
+  .getElementById("playlistNameInput")
+  .addEventListener(
+    "keydown",
+    (event) => {
+      event.stopPropagation();
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+
+        handleCreatePlaylist();
+
+      }
+    }
+  );
+
 
 const musicTabs = document.querySelectorAll('.musicTabs'); 
 
@@ -4417,6 +4568,15 @@ searchInput.addEventListener("input", () => {
   document.addEventListener(
   "click",
   async (event) => {
+
+    const createBtn = event.target.closest('#createPlaylistBtn');
+  
+  if (createBtn) {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log("Create playlist button clicked");
+    openCreatePlaylistModal();
+  }
 
     // =========================
     // ALBUM

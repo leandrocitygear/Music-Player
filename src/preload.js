@@ -122,6 +122,20 @@ selectMusicFolder: () =>
     ipcRenderer.invoke(
         "delete-song",
         songId
-    )
+    ),
+
+    createPlaylist: (
+  name,
+  description
+) =>
+  ipcRenderer.invoke(
+    "create-playlist",
+    name,
+    description
+  ),
+  deletePlaylist: (playlistId) => 
+    ipcRenderer.invoke('deletePlaylist', playlistId),
+  addSongToPlaylist: (playlistId, songId) => 
+    ipcRenderer.invoke('addSongToPlaylist', playlistId, songId)
       
 });
