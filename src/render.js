@@ -1,10 +1,3 @@
-
-
-
-
-
-
-console.log("🔥 DISCOUT RENDERER LOADED");
 document.addEventListener("DOMContentLoaded", async () => {
   
   const library = {
@@ -17,33 +10,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   
   let activeTab = 'albums';
   let selectedArtistId = null;
-let selectedGenreId = null;
-let selectedPlaylistId = null;
+  let selectedGenreId = null;
+  let selectedPlaylistId = null;
 
-const audio = document.getElementById('myAudio');
+  const audio = document.getElementById('myAudio');
   let currentSong = null;
   let currentSongIndex = -1;
-  
   let isShuffle = false;
   let repeatMode = "off"; // off, all, one
   const progressBar = document.getElementById("myBar");
-
   const progress = document.getElementById("myProgress");
-
-  const progressHandle =
-  document.getElementById("progressHandle");
-
-  const songTitle = document.querySelector(".player .title");
-  
-  
-  
   let currentAudioUrl = null;
-
   let queueSongs = [];
-let queueIndex = -1;
-let searchQuery = "";
+  let queueIndex = -1;
+  let searchQuery = "";
+  let queueCleared = false;  
 
-  
   async function loadLibrary() {
     
     try {
@@ -51,23 +33,21 @@ let searchQuery = "";
       const data =
       await window.electronAPI.getLibrary();
 
-    library.albums = data.albums;
-    library.artists = data.artists;
-    library.songs = data.songs;
-    library.genres = data.genres;
-    library.playlists = data.playlists;
+      library.albums = data.albums;
+      library.artists = data.artists;
+      library.songs = data.songs;
+      library.genres = data.genres;
+      library.playlists = data.playlists;
 
-    console.log("Library loaded:", library);
-      
-      console.log("Albums:", library.albums);
-      console.log("Artists:", library.artists);
-      console.log("Songs:", library.songs);
-      console.log("Genres:", library.genres);
-      console.log("Playlists:", library.playlists);
+      // console.log("Library loaded:", library);
+      // console.log("Albums:", library.albums);
+      // console.log("Artists:", library.artists);
+      // console.log("Songs:", library.songs);
+      // console.log("Genres:", library.genres);
+      // console.log("Playlists:", library.playlists);
       
       renderCurrentView();
-    
-      
+  
     } catch (error) {
       console.error(
         "Failed to load library:",
@@ -75,7 +55,6 @@ let searchQuery = "";
       );
     }
   }
-  
   
   const addFiles = document.getElementById('settings');
   
@@ -85,7 +64,6 @@ let searchQuery = "";
   
   function showAddMenu() {
     
-    // Don't create duplicates
     if (document.getElementById('addMenu')) {
       return;
     }
@@ -113,12 +91,12 @@ let searchQuery = "";
     document.body.appendChild(menu);
     
     function showImportProgressModal() {
-  const modal = document.getElementById("importProgressModal");
-  document.getElementById("importProgressBar").style.width = "0%";
-  document.getElementById("importProgressText").textContent = "Starting...";
-  document.getElementById("importProgressFile").textContent = "";
-  modal.classList.add("visible");
-}
+    const modal = document.getElementById("importProgressModal");
+    document.getElementById("importProgressBar").style.width = "0%";
+    document.getElementById("importProgressText").textContent = "Starting...";
+    document.getElementById("importProgressFile").textContent = "";
+    modal.classList.add("visible");
+    }
 
 function updateImportProgressModal({ current, total, fileName }) {
   const percent = total > 0
@@ -283,17 +261,7 @@ const queue = document.getElementById('queue');
         queue.style.display = 'none';
       })
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      function renderCurrentView() {
+function renderCurrentView() {
   switch (activeTab) {
     case "albums":
       renderAlbums();
@@ -1257,7 +1225,7 @@ function renderPlaylists() {
               id="createPlaylistBtn"
             >
 
-              <span>＋</span>
+              <span><img src="./icons/add.png" alt=""></span>
 
               <span>
                 Create New Playlist
@@ -1302,7 +1270,7 @@ function renderPlaylists() {
             id="createPlaylistBtn"
           >
 
-            <span>＋</span>
+            <span><img src="./icons/add.png" alt=""></span>
 
             <span>
               Create New Playlist
@@ -1453,6 +1421,8 @@ function renderQueue() {
     return;
   }
 
+    queueCleared = false;
+
   if (currentSong) {
     const currentIndex = queueSongs.findIndex(
       song => String(song.id) === String(currentSong.id)
@@ -1572,6 +1542,11 @@ function shuffleArray(array) {
 }
 
 function shuffleQueue() {
+
+  if (queueSongs.length === 0) {
+    originalQueueOrder = [];
+    return;
+  }
 
   originalQueueOrder = [...queueSongs];
 
@@ -1748,42 +1723,43 @@ function removeFromQueue(index) {
 
 }
 
-function playQueue(songs, startIndex = 0) {
+// function playQueue(songs, startIndex = 0) {
 
-  if (!songs || songs.length === 0) {
-    return;
-  }
+//   if (!songs || songs.length === 0) {
+//     return;
+//   }
 
-  queueSongs = [...songs];
+//   queueSongs = [...songs];
 
-  queueIndex = startIndex;
+//   queueIndex = startIndex;
 
-  renderQueue();
+//   renderQueue();
 
-  playSong(queueSongs[queueIndex]);
-}
+//   playSong(queueSongs[queueIndex]);
+// }
 
-function playNextInQueue(song) {
+// function playNextInQueue(song) {
 
-  if (!song) return;
+//   if (!song) return;
 
-  const insertIndex = queueIndex + 1;
+//   const insertIndex = queueIndex + 1;
 
-  queueSongs.splice(insertIndex, 0, song);
+//   queueSongs.splice(insertIndex, 0, song);
 
-  renderQueue();
+//   renderQueue();
 
-  console.log(
-    "Playing next:",
-    song.title
-  );
-}
+//   console.log(
+//     "Playing next:",
+//     song.title
+//   );
+// }
 
 function clearQueue() {
 
   queueSongs = [];
   queueIndex = -1;
-
+  queueCleared = true;
+  originalQueueOrder = [];
   renderQueue();
 console.log("Queue cleared");
 }
@@ -2248,6 +2224,11 @@ function playPreviousSong() {
   if (!currentSong) return;
 
   if (queueSongs.length === 0) {
+
+    if (queueCleared) {
+      return;
+    }
+
     playLibraryPreviousSong();
     return;
   }
@@ -2318,6 +2299,13 @@ function playNextSong() {
   }
 
   if (queueSongs.length === 0) {
+
+    if (queueCleared) {
+      audio.pause();
+      updatePlayButton();
+      return;
+    }
+
     playLibraryNextSong();
     return;
   }
@@ -2468,9 +2456,6 @@ document
     (audio.currentTime / audio.duration) * 100;
 
   progressBar.style.width = `${progress}%`;
-
-  //  progressHandle.style.left =
-  //   `${progress}%`;
 
 });
 
@@ -2710,6 +2695,35 @@ function updateFavoriteIcons() {
     });
 }
 
+function saveScrollPositions() {
+  return {
+    album: document.getElementById("albumWindow")?.scrollTop || 0,
+    song: document.querySelector(".songBody")?.scrollTop || 0,
+    artistList: document.getElementById("artistList")?.scrollTop || 0,
+    artistMusic: document.getElementById("artistMusicResults")?.scrollTop || 0,
+    genreList: document.getElementById("genreList")?.scrollTop || 0,
+    genreMusic: document.getElementById("genreMusicResults")?.scrollTop || 0,
+    playlistList: document.getElementById("playlistList")?.scrollTop || 0,
+    playlistMusic: document.getElementById("playlistMusicResults")?.scrollTop || 0
+  };
+}
+
+function restoreScrollPositions(pos) {
+  const set = (selector, value) => {
+    const el = document.querySelector(selector);
+    if (el) el.scrollTop = value;
+  };
+
+  set("#albumWindow", pos.album);
+  set(".songBody", pos.song);
+  set("#artistList", pos.artistList);
+  set("#artistMusicResults", pos.artistMusic);
+  set("#genreList", pos.genreList);
+  set("#genreMusicResults", pos.genreMusic);
+  set("#playlistList", pos.playlistList);
+  set("#playlistMusicResults", pos.playlistMusic);
+}
+
 async function toggleFavorite(song) {
 
  if (!song) return;
@@ -2753,10 +2767,14 @@ async function toggleFavorite(song) {
         ? "./icons/likefull.png"
         : "./icons/favorite.png";
 
+        // Save current scroll position
+const scrollPos = saveScrollPositions();
 
     // Refresh the current view
     renderCurrentView();
+    restoreScrollPositions(scrollPos);
     updateFavoriteIcons();
+
 
     console.log(
       newFavoriteState
@@ -3646,9 +3664,24 @@ async function toggleAlbumFavorites(album) {
     }
   }
 
+   // SAVE ALBUM SCROLL POSITION
+  const albumWindow =
+    document.getElementById("albumWindow");
+
+  const scrollTop =
+    albumWindow?.scrollTop || 0;
+
+
 
   await loadLibrary();
 
+    // RESTORE ALBUM SCROLL POSITION
+  const newAlbumWindow =
+    document.getElementById("albumWindow");
+
+  if (newAlbumWindow) {
+    newAlbumWindow.scrollTop = scrollTop;
+  }
 
   // Update player favorite icon
   if (currentSong) {
@@ -4769,41 +4802,6 @@ if (genreClick) {
 
   return;
 }
-
-    // =========================
-    // QUEUE SONG
-    // =========================
-
-    // const queueSong =
-    //   event.target.closest(
-    //     ".queueSong"
-    //   );
-
-    // if (queueSong) {
-
-    //   const queueIndexClicked =
-    //     Number(
-    //       queueSong.dataset.queueIndex
-    //     );
-
-    //   if (
-    //     queueIndexClicked < 0 ||
-    //     queueIndexClicked >= queueSongs.length
-    //   ) {
-    //     return;
-    //   }
-
-    //   queueIndex =
-    //     queueIndexClicked;
-
-    //   renderQueue();
-
-    //   await playSong(
-    //     queueSongs[queueIndex]
-    //   );
-
-    //   return;
-    // }
 
 
     // =========================

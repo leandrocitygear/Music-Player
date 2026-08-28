@@ -24,10 +24,10 @@
   <div id="queueOverlay"></div>
 
   <div id="queueHeader">
-    <p>Queue</p>
+    <!-- <p>Queue</p> -->
 
     <button id="clearQueue">
-      Clear
+      Clear Queue
     </button>
   </div>
 
@@ -120,7 +120,6 @@
     
     <input id="search"
   type="search"
-  placeholder="Search your music..."
   autocomplete="off"/>
     <div id="searchButton" class="icons">
       <img src="./icons/search.png" alt="">
@@ -182,24 +181,30 @@
   <div class="contextSection" data-menu="song">
 
     <button class="contextItem" data-action="play">
-      <span>▶</span>
+      <span><img  src="./icons/play.png" alt=""></span>
       <span>Play</span>
     </button>
 
     <button class="contextItem" data-action="play-next">
-      <span>⏭</span>
+      <span>
+    <img  src="./icons/skip_next.png" alt="">
+      </span>
       <span>Play Next</span>
     </button>
 
     <button class="contextItem" data-action="add-queue">
-      <span>➕</span>
+      <span>
+    <img src="./icons/add.png" alt="">
+      </span>
       <span>Add to Queue</span>
     </button>
 
     <div class="contextDivider"></div>
 
     <button class="contextItem" data-action="favorite">
-      <span>❤️</span>
+      <span>
+    <img src="./icons/favorite.png" alt="">
+      </span>
       <span class="favoriteText">
         Add to Favorites
       </span>
@@ -208,17 +213,23 @@
     <div class="contextDivider"></div>
 
     <button class="contextItem" data-action="go-album">
-      <span>📀</span>
+      <span>
+    <img src="./icons/album.png" alt="">
+      </span>
       <span>Go to Album</span>
     </button>
 
     <button class="contextItem" data-action="go-artist">
-      <span>👤</span>
+      <span>
+    <img src="./icons/artist.png" alt="">
+      </span>
       <span>Go to Artist</span>
     </button>
 
     <button class="contextItem" data-action="add-playlist">
-      <span>➕</span>
+      <span>
+    <img src="./icons/playlist_add.png" alt="">
+      </span>
       <span>Add to Playlist</span>
     </button>
 
@@ -227,7 +238,9 @@
       data-action="remove-playlist"
       id="removeFromPlaylistItem"
     >
-      <span>🗑</span>
+      <span>
+    <img src="./icons/playlist_remove.png" alt="">
+      </span>
       <span>Remove from Playlist</span>
     </button>
 
@@ -237,7 +250,9 @@
       class="contextItem danger"
       data-action="delete-song"
     >
-      <span>🗑</span>
+      <span>
+    <img src="./icons/delete.png" alt="">
+      </span>
       <span>Delete Song</span>
     </button>
 
@@ -248,31 +263,41 @@
   <div class="contextSection" data-menu="album">
 
     <button class="contextItem" data-action="play-album">
-      <span>▶</span>
+      <span>
+    <img src="./icons/play.png" alt="">
+      </span>
       <span>Play Album</span>
     </button>
 
     <button class="contextItem" data-action="album-next">
-      <span>⏭</span>
+      <span>
+    <img src="./icons/skip_next.png" alt="">
+      </span>
       <span>Play Next</span>
     </button>
 
     <button class="contextItem" data-action="album-queue">
-      <span>➕</span>
+      <span>
+    <img src="./icons/add.png" alt="">
+      </span>
       <span>Add Album to Queue</span>
     </button>
 
     <div class="contextDivider"></div>
 
     <button class="contextItem" data-action="album-favorite">
-      <span>❤️</span>
+      <span>
+    <img src="./icons/favorite.png" alt="">
+      </span>
       <span class="albumFavoriteText">
         Add All to Favorites
       </span>
     </button>
 
     <button class="contextItem" data-action="album-artist">
-      <span>👤</span>
+      <span>
+    <img src="./icons/artist.png" alt="">
+      </span>
       <span>Go to Artist</span>
     </button>
 
@@ -282,7 +307,9 @@
       class="contextItem danger"
       data-action="delete-album"
     >
-      <span>🗑</span>
+      <span>
+    <img src="./icons/delete.png" alt="">
+      </span>
       <span>Delete Album</span>
     </button>
 
@@ -293,12 +320,16 @@
   <div class="contextSection" data-menu="artist">
 
     <button class="contextItem" data-action="play-artist">
-      <span>▶</span>
+      <span>
+    <img src="./icons/play.png" alt="">
+      </span>
       <span>Play Artist</span>
     </button>
 
     <button class="contextItem" data-action="artist-queue">
-      <span>➕</span>
+      <span>
+    <img src="./icons/add.png" alt="">
+      </span>
       <span>Add Artist to Queue</span>
     </button>
 
@@ -309,17 +340,23 @@
   <div class="contextSection" data-menu="playlist">
 
     <button class="contextItem" data-action="play-playlist">
-      <span>▶</span>
+      <span>
+    <img src="./icons/play.png" alt="">
+      </span>
       <span>Play Playlist</span>
     </button>
 
     <button class="contextItem" data-action="playlist-next">
-      <span>⏭</span>
+      <span>
+    <img src="./icons/skip_next.png" alt="">
+      </span>
       <span>Play Next</span>
     </button>
 
     <button class="contextItem" data-action="playlist-queue">
-      <span>➕</span>
+      <span>
+    <img src="./icons/add.png" alt="">
+      </span>
       <span>Add Playlist to Queue</span>
     </button>
 
@@ -329,7 +366,9 @@
       class="contextItem danger"
       data-action="delete-playlist"
     >
-      <span>🗑</span>
+      <span>
+    <img src="./icons/delete.png" alt="">
+      </span>
       <span>Delete Playlist</span>
     </button>
 
@@ -339,17 +378,23 @@
   <div class="contextSection" data-menu="queue">
 
     <button class="contextItem" data-action="remove-queue">
-      <span>🗑</span>
+      <span>
+    <img src="./icons/remove.png" alt="">
+      </span>
       <span>Remove from Queue</span>
     </button>
 
     <button class="contextItem" data-action="go-album">
-      <span></span>
+      <span>
+    <img src="./icons/album.png" alt="">
+      </span>
       <span>Go to Album</span>
     </button>
 
     <button class="contextItem" data-action="go-artist">
-      <span></span>
+      <span>
+    <img src="./icons/artist.png" alt="">
+      </span>
       <span>Go to Artist</span>
     </button>
 
@@ -359,16 +404,17 @@
 
 <div id="playlistPicker" class="playlistPicker">
 
-  <button
-        id="closePlaylistPicker"
-        class="PlaylistPickerClose"
-      >
-        ×
-    </button>
-    
-
+  
+  
   <div class="playlistPickerHeader">
     Add to Playlist
+
+    <div
+          id="closePlaylistPicker"
+          class="PlaylistPickerClose"
+        >
+          <img src="./icons/removeback.png" alt="">
+      </div>
   </div>
 
   <div id="playlistPickerList"></div>
@@ -386,7 +432,7 @@
         id="closeCreatePlaylist"
         class="createPlaylistClose"
       >
-        ×
+          <img src="./icons/removeback.png" alt="">
       </button>
     </div>
 
