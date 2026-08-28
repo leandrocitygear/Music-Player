@@ -337,7 +337,7 @@ function renderArtistMusic() {
 
       <img 
         class="artistAlbumImg"
-        src="${album.artwork_path || './icons/album.png'}"
+        src="${album.artwork_path || './b.jpg'}"
       />
 
       <div class="artistAlbumInfo">
@@ -415,7 +415,7 @@ function renderSelectedAlbum(albumId) {
   );
 
   document.getElementById('selectedAlbumArt').src =
-    album.artwork_path || './icons/album.png';
+    album.artwork_path || './b.jpg';
 
   document.getElementById('selectedAlbumName').textContent =
     album.title || 'Unknown Album';
@@ -1723,36 +1723,6 @@ function removeFromQueue(index) {
 
 }
 
-// function playQueue(songs, startIndex = 0) {
-
-//   if (!songs || songs.length === 0) {
-//     return;
-//   }
-
-//   queueSongs = [...songs];
-
-//   queueIndex = startIndex;
-
-//   renderQueue();
-
-//   playSong(queueSongs[queueIndex]);
-// }
-
-// function playNextInQueue(song) {
-
-//   if (!song) return;
-
-//   const insertIndex = queueIndex + 1;
-
-//   queueSongs.splice(insertIndex, 0, song);
-
-//   renderQueue();
-
-//   console.log(
-//     "Playing next:",
-//     song.title
-//   );
-// }
 
 function clearQueue() {
 
