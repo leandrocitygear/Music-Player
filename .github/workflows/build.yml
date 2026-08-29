@@ -27,13 +27,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Set Python environment
+      - name: Set Python
         shell: pwsh
         run: |
           "PYTHON=$env:pythonLocation\python.exe" >> $env:GITHUB_ENV
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
+
+      - name: Rebuild native modules for Electron
+        run: npx electron-rebuild -f -w better-sqlite3
 
       - name: Build Windows installer
         run: npm run make
@@ -65,13 +68,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Set Python environment
+      - name: Set Python
         shell: bash
         run: |
           echo "PYTHON=$pythonLocation/python" >> "$GITHUB_ENV"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
+
+      - name: Rebuild native modules for Electron
+        run: npx electron-rebuild -f -w better-sqlite3
 
       - name: Build macOS installer
         run: npm run make
