@@ -8,64 +8,63 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build ${{ matrix.platform }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: Windows
-            os: windows-latest
-            make_command: npm run make
-            artifact_path: out/make/**/*
-
-          - platform: macOS
-            os: macos-latest
-            make_command: npm run make
-            artifact_path: out/make/**/*
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
 
     steps:
-      # --------------------------------
-      # Get your source code
-      # --------------------------------
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # --------------------------------
-      # Install Node
-      # --------------------------------
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
 
-      # --------------------------------
-      # Install dependencies
-      # --------------------------------
       - name: Install dependencies
         run: npm ci
 
-      # --------------------------------
-      # Rebuild better-sqlite3 for Electron
-      # --------------------------------
-      - name: Rebuild native modules
+      - name: Rebuild better-sqlite3
         run: npx electron-rebuild -f -w better-sqlite3
 
-      # --------------------------------
-      # Build Electron application
-      # --------------------------------
-      - name: Make application
-        run: ${{ matrix.make_command }}
+      - name: Build Windows installer
+        run: npm run make
 
-      # --------------------------------
-      # Upload installer/artifacts
-      # --------------------------------
-      - name: Upload ${{ matrix.platform }} build
+      - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
-          name: Disc-Out-${{ matrix.platform }}
-          path: ${{ matrix.artifact_path }}
+          name: Disc-Out-Windows
+          path: out/make/**
+          if-no-files-found: error
+
+
+  build-macos:
+    name: Build macOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Rebuild better-sqlite3
+        run: npx electron-rebuild -f -w better-sqlite3
+
+      - name: Build macOS installer
+        run: npm run make
+
+      - name: Upload macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Disc-Out-macOS
+          path: out/make/**
           if-no-files-found: error
