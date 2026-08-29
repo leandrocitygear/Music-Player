@@ -3,7 +3,7 @@ name: Build Disc-Out
 on:
   push:
     branches:
-      - main
+      - master
 
   workflow_dispatch:
 
@@ -22,11 +22,18 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Configure npm Python
+        shell: pwsh
+        run: |
+          npm config set python "${{ env.pythonLocation }}\python.exe"
+
       - name: Install dependencies
         run: npm ci
-
-      - name: Rebuild better-sqlite3
-        run: npx electron-rebuild -f -w better-sqlite3
 
       - name: Build Windows installer
         run: npm run make
@@ -53,11 +60,16 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Configure npm Python
+        run: npm config set python "${pythonLocation}/python"
+
       - name: Install dependencies
         run: npm ci
-
-      - name: Rebuild better-sqlite3
-        run: npx electron-rebuild -f -w better-sqlite3
 
       - name: Build macOS installer
         run: npm run make
