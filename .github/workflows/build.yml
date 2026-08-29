@@ -1,0 +1,71 @@
+name: Build Disc-Out
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Windows
+            os: windows-latest
+            make_command: npm run make
+            artifact_path: out/make/**/*
+
+          - platform: macOS
+            os: macos-latest
+            make_command: npm run make
+            artifact_path: out/make/**/*
+
+    steps:
+      # --------------------------------
+      # Get your source code
+      # --------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # --------------------------------
+      # Install Node
+      # --------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # --------------------------------
+      # Install dependencies
+      # --------------------------------
+      - name: Install dependencies
+        run: npm ci
+
+      # --------------------------------
+      # Rebuild better-sqlite3 for Electron
+      # --------------------------------
+      - name: Rebuild native modules
+        run: npx electron-rebuild -f -w better-sqlite3
+
+      # --------------------------------
+      # Build Electron application
+      # --------------------------------
+      - name: Make application
+        run: ${{ matrix.make_command }}
+
+      # --------------------------------
+      # Upload installer/artifacts
+      # --------------------------------
+      - name: Upload ${{ matrix.platform }} build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Disc-Out-${{ matrix.platform }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error

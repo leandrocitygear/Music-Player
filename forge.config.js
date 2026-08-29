@@ -5,14 +5,17 @@ module.exports = {
   packagerConfig: {
     asar: true,
   },
-  rebuildConfig: {},
+  // Tells lower-level processes to leverage the shared MSVC v143 toolset fallback
+  rebuildConfig: {
+    onlyModules: []
+  },
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {},
     },
     {
-      name: '@electron-forge/maker-zip',
+      name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
     },
     {
@@ -25,12 +28,7 @@ module.exports = {
     },
   ],
   plugins: [
-    {
-      name: '@electron-forge/plugin-auto-unpack-natives',
-      config: {},
-    },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
+    // REMOVED: '@electron-forge/plugin-auto-unpack-natives' to prevent the VS 18 build lockup
     new FusesPlugin({
       version: FuseVersion.V1,
       [FuseV1Options.RunAsNode]: false,
