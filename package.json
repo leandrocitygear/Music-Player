@@ -12,13 +12,13 @@
     "lint": "echo \"No linting configured\""
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/cli": "^7.11.2",
     "@electron-forge/maker-deb": "^7.4.0",
     "@electron-forge/maker-rpm": "^7.4.0",
-    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.11.2",
     "@electron-forge/maker-zip": "^7.4.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
-    "@electron-forge/plugin-fuses": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
+    "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "electron": "^41.2.0",
     "electronmon": "^2.0.4"
@@ -36,5 +36,7 @@
     "jsmediatags": "^1.1.0",
     "music-metadata": "^11.15.0",
     "uuid": "^9.0.1"
+  }, "overrides": {
+    "@electron/node-gyp": "^12.4.0"
   }
 }
