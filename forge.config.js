@@ -12,7 +12,7 @@ module.exports = {
     executableName: 'disc-out',
     icon: path.resolve(
     __dirname,
-    './favicon_io/android-chrome-512x512.png'
+    'favicon_io', 'favicon'
   ),
   },
 
@@ -28,9 +28,6 @@ module.exports = {
       config: {
         manufacturer: 'Disc-Out',
         name: 'Disc-Out',
-        icon: path.resolve(
-    __dirname,
-    './favicon_io/android-chrome-512x512.png'),
       },
     },
 

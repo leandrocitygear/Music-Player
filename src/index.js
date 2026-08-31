@@ -41,7 +41,8 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    icon: path.join(__dirname, './favicon_io/android-chrome-512x512.png'),
+    icon: path.join(__dirname, 'favicon_io',
+    'favicon.ico'),
     width: 1012,
     height: 690,
     minWidth: 1012,
