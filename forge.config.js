@@ -25,10 +25,11 @@ module.exports = {
     {
       name: '@felixrieseberg/electron-forge-maker-nsis',
       platforms: ['win32'],
-      config: {
-        // codesigning: {},   // add later if you sign your builds
-        // updater: {},       // add later if you use electron-updater
-      },
+       config: {
+      getAdditionalConfig: () => ({
+        publish: null,
+      }),
+    },
     },
 
     // macOS DMG
