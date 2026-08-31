@@ -25,6 +25,12 @@ module.exports = {
   },
 
   makers: [
+
+    {
+  name: '@electron-forge/maker-zip',
+  platforms: ['win32'],
+  config: {}
+},
     // macOS DMG
     {
       name: '@electron-forge/maker-dmg',

@@ -9,63 +9,55 @@ on:
 
 jobs:
   build-windows:
-    name: Build Windows MSIX
+    name: Build Windows ZIP
     runs-on: windows-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v5
 
-    - name: Setup Node
-      uses: actions/setup-node@v5
-      with:
-        node-version: 22
-        cache: npm
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
 
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: "3.12"
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
 
-    - name: Set Python
-      shell: pwsh
-      run: |
-        "PYTHON=$env:pythonLocation\python.exe" >> $env:GITHUB_ENV
+      - name: Set Python
+        shell: pwsh
+        run: |
+          "PYTHON=$env:pythonLocation\python.exe" >> $env:GITHUB_ENV
 
-    - name: Install dependencies
-      run: npm ci --ignore-scripts
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
 
-    - name: Rebuild better-sqlite3
-      run: npx electron-rebuild -f -w better-sqlite3
+      - name: Rebuild better-sqlite3
+        run: npx electron-rebuild -f -w better-sqlite3
 
-    - name: Build Windows MSIX
-      run: npm run dist:win
-      env:
-        CSC_IDENTITY_AUTO_DISCOVERY: false
+      - name: Build Windows ZIP
+        run: npm run make
 
-    - name: List build output
-      if: always()
-      shell: pwsh
-      run: |
-        Write-Host "Current directory:"
-        Get-Location
+      - name: List build output
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "Out directory:"
+          if (Test-Path out) {
+            Get-ChildItem out -Recurse
+          } else {
+            Write-Host "out directory does not exist"
+          }
 
-        Write-Host "Files:"
-        Get-ChildItem -Recurse -Depth 3
-
-        Write-Host "Out directory:"
-        if (Test-Path out) {
-          Get-ChildItem out -Recurse
-        } else {
-          Write-Host "out directory does not exist"
-        }
-
-    - name: Upload Windows MSIX
-      uses: actions/upload-artifact@v5
-      with:
-        name: Disc-Out-Windows-MSIX
-        path: out/msix/**/*.msix
-        if-no-files-found: error
+      - name: Upload Windows ZIP
+        uses: actions/upload-artifact@v5
+        with:
+          name: Disc-Out-Windows
+          path: out/make/**/*.zip
+          if-no-files-found: error
       
   build-macos-intel:
     name: Build macOS Intel Installer
