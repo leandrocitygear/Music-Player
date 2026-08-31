@@ -23,14 +23,13 @@ module.exports = {
   makers: [
     // Windows installer
     {
-    name: '@electron-forge/maker-squirrel',
-    platforms: ['win32'],
-    config: {
-      name: 'DiscOut',
-      authors: 'Leandro',
-      description: 'A desktop music player built with Electron',
+      name: '@felixrieseberg/electron-forge-maker-nsis',
+      platforms: ['win32'],
+      config: {
+        // codesigning: {},   // add later if you sign your builds
+        // updater: {},       // add later if you use electron-updater
+      },
     },
-  },
 
     // macOS DMG
     {

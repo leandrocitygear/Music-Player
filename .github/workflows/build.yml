@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   build-windows:
     name: Build Windows Installer
     runs-on: windows-latest
@@ -39,23 +38,19 @@ jobs:
     - name: Rebuild better-sqlite3
       run: npx electron-rebuild -f -w better-sqlite3
 
-    - name: Verify Squirrel
-      shell: pwsh
-      run: |
-        Write-Host "Checking electron-winstaller..."
-        npm ls electron-winstaller
-
-        Write-Host "Checking Squirrel vendor files..."
-        Get-ChildItem node_modules/electron-winstaller/vendor -Recurse
-
     - name: Build Windows installer
       run: npm run make
+
+    - name: List build output
+      if: always()
+      shell: pwsh
+      run: Get-ChildItem out/make -Recurse
 
     - name: Upload Windows installer
       uses: actions/upload-artifact@v5
       with:
-        name: Disc-Out-Windows-Squirrel-Installer
-        path: out/make/squirrel.windows/**
+        name: Disc-Out-Windows-NSIS-Installer
+        path: out/make/**/*.exe
         if-no-files-found: error
       
   build-macos-intel:

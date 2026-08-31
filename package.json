@@ -23,6 +23,7 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "@electron/rebuild": "^4.2.0",
+    "@felixrieseberg/electron-forge-maker-nsis": "^7.2.0",
     "electron": "^41.2.0",
     "electronmon": "^2.0.4"
   },
