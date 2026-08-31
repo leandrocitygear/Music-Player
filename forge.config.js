@@ -15,17 +15,23 @@ module.exports = {
   },
 
   makers: [
+    // Windows installer
     {
-      name: '@electron-forge/maker-squirrel',
+      name: '@electron-forge/maker-wix',
       platforms: ['win32'],
-      config: {},
+      config: {
+        manufacturer: 'Disc-Out',
+        name: 'Disc-Out',
+      },
     },
 
+    // macOS DMG
     {
       name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
     },
 
+    // Linux
     {
       name: '@electron-forge/maker-deb',
       platforms: ['linux'],
