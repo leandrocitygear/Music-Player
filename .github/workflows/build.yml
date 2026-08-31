@@ -39,6 +39,15 @@ jobs:
     - name: Rebuild better-sqlite3
       run: npx electron-rebuild -f -w better-sqlite3
 
+    - name: Verify Squirrel
+      shell: pwsh
+      run: |
+        Write-Host "Checking electron-winstaller..."
+        npm ls electron-winstaller
+
+        Write-Host "Checking Squirrel vendor files..."
+        Get-ChildItem node_modules/electron-winstaller/vendor -Recurse
+
     - name: Build Windows installer
       run: npm run make
 
