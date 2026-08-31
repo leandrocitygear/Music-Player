@@ -12,7 +12,7 @@ module.exports = {
     executableName: 'disc-out',
     icon: path.resolve(
     __dirname,
-    'src/favicon_io/favicon'
+    'src/favicon_io/favicon.ico'
   ),
   },
 
