@@ -1,3 +1,4 @@
+const path = require('path');
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 
 const {
@@ -8,6 +9,11 @@ const {
 module.exports = {
   packagerConfig: {
     asar: true,
+
+    icon: path.resolve(
+    __dirname,
+    'src/favicon_io/favicon'
+  ),
   },
 
   rebuildConfig: {

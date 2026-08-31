@@ -99,3 +99,43 @@ jobs:
         name: Disc-Out-macOS-Intel-Installer
         path: out/make/**
         if-no-files-found: error
+
+  build-linux:
+    name: Build Linux Installers
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Setup Node
+      uses: actions/setup-node@v5
+      with:
+        node-version: 22
+        cache: npm
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
+
+    - name: Set Python
+      shell: bash
+      run: |
+        echo "PYTHON=$pythonLocation/python" >> "$GITHUB_ENV"
+
+    - name: Install dependencies
+      run: npm ci --ignore-scripts
+
+    - name: Rebuild better-sqlite3
+      run: npx electron-rebuild -f -w better-sqlite3
+
+    - name: Build Linux installers
+      run: npm run make
+
+    - name: Upload Linux installers
+      uses: actions/upload-artifact@v5
+      with:
+        name: Disc-Out-Linux-Installers
+        path: out/make/**
+        if-no-files-found: error
