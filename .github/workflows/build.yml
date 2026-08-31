@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-windows:
-    name: Build Windows
+    name: Build Windows Installer
     runs-on: windows-latest
 
     steps:
@@ -35,23 +35,23 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Rebuild native modules for Electron
+      - name: Rebuild better-sqlite3
         run: npx electron-rebuild -f -w better-sqlite3
 
       - name: Build Windows installer
         run: npm run make
 
-      - name: Upload Windows build
+      - name: Upload Windows installer
         uses: actions/upload-artifact@v5
         with:
-          name: Disc-Out-Windows
+          name: Disc-Out-Windows-Installer
           path: out/make/**
           if-no-files-found: error
 
 
-  build-macos:
-    name: Build macOS
-    runs-on: macos-latest
+  build-macos-intel:
+    name: Build macOS Intel Installer
+    runs-on: macos-13
 
     steps:
       - name: Checkout
@@ -76,15 +76,18 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Rebuild native modules for Electron
+      - name: Rebuild better-sqlite3
         run: npx electron-rebuild -f -w better-sqlite3
 
-      - name: Build macOS installer
-        run: npm run make
+      - name: Rebuild macOS DMG dependencies
+        run: npm rebuild macos-alias ds-store
 
-      - name: Upload macOS build
+      - name: Build macOS Intel installer
+        run: npm run make -- --arch=x64
+
+      - name: Upload macOS Intel installer
         uses: actions/upload-artifact@v5
         with:
-          name: Disc-Out-macOS
+          name: Disc-Out-macOS-Intel-Installer
           path: out/make/**
           if-no-files-found: error

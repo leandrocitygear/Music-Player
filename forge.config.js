@@ -15,20 +15,23 @@ module.exports = {
   },
 
   makers: [
-    // Windows + macOS ZIP builds
     {
-      name: '@electron-forge/maker-zip',
-      platforms: ['win32', 'darwin'],
+      name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
+      config: {},
     },
 
-    // Linux .deb
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+    },
+
     {
       name: '@electron-forge/maker-deb',
       platforms: ['linux'],
       config: {},
     },
 
-    // Linux .rpm
     {
       name: '@electron-forge/maker-rpm',
       platforms: ['linux'],
