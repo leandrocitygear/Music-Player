@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-windows:
-    name: Build Windows Installer
+    name: Build Windows MSIX
     runs-on: windows-latest
 
     steps:
@@ -38,19 +38,19 @@ jobs:
     - name: Rebuild better-sqlite3
       run: npx electron-rebuild -f -w better-sqlite3
 
-    - name: Build Windows installer
-      run: npm run make
+    - name: Build Windows MSIX
+      run: npm run dist:win
 
     - name: List build output
       if: always()
       shell: pwsh
-      run: Get-ChildItem out/make -Recurse
+      run: Get-ChildItem out/msix -Recurse
 
-    - name: Upload Windows installer
+    - name: Upload Windows MSIX
       uses: actions/upload-artifact@v5
       with:
-        name: Disc-Out-Windows-NSIS-Installer
-        path: out/make/**/*.exe
+        name: Disc-Out-Windows-MSIX
+        path: out/msix/**/*.msix
         if-no-files-found: error
       
   build-macos-intel:

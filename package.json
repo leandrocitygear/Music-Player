@@ -9,8 +9,43 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "dist:win": "electron-builder --win --x64"
   },
+
+  "build": {
+  "appId": "com.discout.music",
+  "productName": "Disc-Out",
+
+  "directories": {
+    "output": "out/msix"
+  },
+
+  "files": [
+    "**/*"
+  ],
+
+  "win": {
+    "target": [
+      {
+        "target": "msix",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "icon": "favicon_io/favicon.ico"
+  },
+
+  "msix": {
+    "identityName": "com.discout.music",
+    "publisher": "CN=Disc-Out",
+    "publisherDisplayName": "Disc-Out",
+    "applicationId": "DiscOut",
+    "displayName": "Disc-Out"
+  }
+},
+
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",
     "@electron-forge/maker-deb": "^7.4.0",
@@ -23,8 +58,8 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "@electron/rebuild": "^4.2.0",
-    "@felixrieseberg/electron-forge-maker-nsis": "^7.2.0",
     "electron": "^41.2.0",
+    "electron-builder": "^26.15.3",
     "electronmon": "^2.0.4"
   },
   "keywords": [],

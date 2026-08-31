@@ -1,4 +1,5 @@
 const path = require('path');
+
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 
 const {
@@ -9,11 +10,14 @@ const {
 module.exports = {
   packagerConfig: {
     asar: true,
+
     executableName: 'disc-out',
+
     icon: path.resolve(
-    __dirname,
-    'favicon_io', 'favicon'
-  ),
+      __dirname,
+      'favicon_io',
+      'favicon.ico'
+    ),
   },
 
   rebuildConfig: {
@@ -21,34 +25,22 @@ module.exports = {
   },
 
   makers: [
-    // Windows installer
-    {
-      name: '@felixrieseberg/electron-forge-maker-nsis',
-      platforms: ['win32'],
-       config: {
-      getAdditionalConfig: () => ({
-        publish: 'never',
-      }),
-    },
-    },
-
     // macOS DMG
     {
       name: '@electron-forge/maker-dmg',
       platforms: ['darwin'],
     },
 
-    // Linux
+    // Linux DEB
     {
       name: '@electron-forge/maker-deb',
       platforms: ['linux'],
-      config: {},
     },
 
+    // Linux RPM
     {
       name: '@electron-forge/maker-rpm',
       platforms: ['linux'],
-      config: {},
     },
   ],
 

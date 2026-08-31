@@ -42,7 +42,7 @@ const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     icon: path.join(__dirname, 'favicon_io',
-    'favicon'),
+    'favicon.ico'),
     width: 1012,
     height: 690,
     minWidth: 1012,
