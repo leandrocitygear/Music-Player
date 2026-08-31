@@ -45,8 +45,8 @@ jobs:
     - name: Upload Windows installer
       uses: actions/upload-artifact@v5
       with:
-        name: Disc-Out-Windows-Installer
-        path: out/make/**
+        name: Disc-Out-Windows-Squirrel-Installer
+        path: out/make/squirrel.windows/**
         if-no-files-found: error
       
   build-macos-intel:
