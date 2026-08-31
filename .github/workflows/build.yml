@@ -50,7 +50,7 @@ jobs:
         if-no-files-found: error
 
 
-  build-macos-intel:
+   build-macos-intel:
     name: Build macOS Intel Installer
     runs-on: macos-latest
 
@@ -80,8 +80,16 @@ jobs:
       - name: Rebuild better-sqlite3
         run: npx electron-rebuild -f -w better-sqlite3
 
-      - name: Rebuild macOS DMG dependencies
-        run: npm rebuild macos-alias ds-store
+      - name: Rebuild DMG native dependencies
+        run: |
+          npm rebuild fs-xattr
+          npm rebuild macos-alias
+          npm rebuild ds-store
+
+      - name: Verify DMG native modules
+        run: |
+          ls -la node_modules/fs-xattr/build/Release/
+          ls -la node_modules/macos-alias/build/Release/ || true
 
       - name: Build macOS Intel installer
         run: npm run make -- --arch=x64
