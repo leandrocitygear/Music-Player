@@ -48,55 +48,54 @@ jobs:
         name: Disc-Out-Windows-Installer
         path: out/make/**
         if-no-files-found: error
-
-
-   build-macos-intel:
+      
+  build-macos-intel:
     name: Build macOS Intel Installer
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
+    - name: Checkout
+      uses: actions/checkout@v5
 
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
+    - name: Setup Node
+      uses: actions/setup-node@v5
+      with:
+        node-version: 22
+        cache: npm
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.12"
 
-      - name: Set Python
-        shell: bash
-        run: |
-          echo "PYTHON=$pythonLocation/python" >> "$GITHUB_ENV"
+    - name: Set Python
+      shell: bash
+      run: |
+        echo "PYTHON=$pythonLocation/python" >> "$GITHUB_ENV"
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
+    - name: Install dependencies
+      run: npm ci --ignore-scripts
 
-      - name: Rebuild better-sqlite3
-        run: npx electron-rebuild -f -w better-sqlite3
+    - name: Rebuild better-sqlite3
+      run: npx electron-rebuild -f -w better-sqlite3
 
-      - name: Rebuild DMG native dependencies
-        run: |
-          npm rebuild fs-xattr
-          npm rebuild macos-alias
-          npm rebuild ds-store
+    - name: Rebuild DMG native dependencies
+      run: |
+        npm rebuild fs-xattr
+        npm rebuild macos-alias
+        npm rebuild ds-store
 
-      - name: Verify DMG native modules
-        run: |
-          ls -la node_modules/fs-xattr/build/Release/
-          ls -la node_modules/macos-alias/build/Release/ || true
+    - name: Verify DMG native modules
+      run: |
+        ls -la node_modules/fs-xattr/build/Release/
+        ls -la node_modules/macos-alias/build/Release/ || true
 
-      - name: Build macOS Intel installer
-        run: npm run make -- --arch=x64
+    - name: Build macOS Intel installer
+      run: npm run make -- --arch=x64
 
-      - name: Upload macOS Intel installer
-        uses: actions/upload-artifact@v5
-        with:
-          name: Disc-Out-macOS-Intel-Installer
-          path: out/make/**
-          if-no-files-found: error
+    - name: Upload macOS Intel installer
+      uses: actions/upload-artifact@v5
+      with:
+        name: Disc-Out-macOS-Intel-Installer
+        path: out/make/**
+        if-no-files-found: error
