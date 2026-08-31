@@ -565,7 +565,7 @@ const genreSongs =
 
       <img
         class="artistAlbumImg"
-        src="${album.artwork_path || './icons/album.png'}"
+        src="${album.artwork_path || './b.jpg'}"
       >
 
       <div class="artistAlbumInfo">
@@ -1228,7 +1228,7 @@ function renderPlaylists() {
               <span><img src="./icons/add.png" alt=""></span>
 
               <span>
-                Create New Playlist
+                Create Playlist
               </span>
 
             </button>
@@ -1273,7 +1273,7 @@ function renderPlaylists() {
             <span><img src="./icons/add.png" alt=""></span>
 
             <span>
-              Create New Playlist
+              Create Playlist
             </span>
 
           </button>
@@ -1318,6 +1318,22 @@ function renderPlaylists() {
 
 let draggedQueueIndex = null;
 let originalQueueOrder = [];
+
+function buildQueueRespectingShuffle(songs, anchorSong) {
+  if (!isShuffle) {
+    const index = songs.findIndex(
+      s => String(s.id) === String(anchorSong.id)
+    );
+    return { queue: [...songs], index: index === -1 ? 0 : index };
+  }
+
+  // Shuffle mode: keep the clicked/anchor song first, shuffle the rest
+  const rest = songs.filter(
+    s => String(s.id) !== String(anchorSong.id)
+  );
+  const shuffledRest = shuffleArray(rest);
+  return { queue: [anchorSong, ...shuffledRest], index: 0 };
+}
 
 function setupQueueDragAndDrop() {
 
@@ -1439,7 +1455,7 @@ function renderQueue() {
       data-song-id="${song.id}"
       draggable="${isActive ? "false" : "true"}"
     >
-      <img class="queueArt" src="${song.artwork_path || "./icons/album.png"}" alt="">
+      <img class="queueArt" src="${song.artwork_path || "./b.jpg"}" alt="">
       <div class="queueSongInfo">
         <p class="queueSongTitle">${song.title || "Unknown Title"}</p>
         <p class="queueAlb">${song.album || "Unknown Album"}</p>
@@ -1542,7 +1558,6 @@ function shuffleArray(array) {
 }
 
 function shuffleQueue() {
-
   if (queueSongs.length === 0) {
     originalQueueOrder = [];
     return;
@@ -1560,12 +1575,16 @@ function shuffleQueue() {
     song => String(song.id) === String(currentSong.id)
   );
 
-  // Keep played history + current song exactly where they are,
-  // only shuffle what's still upcoming
+  if (currentIndex === -1) {
+    // current song isn't in this queue — just shuffle everything
+    queueSongs = shuffleArray(queueSongs);
+    renderQueue();
+    return;
+  }
+
   const played = queueSongs.slice(0, currentIndex);
   const current = queueSongs[currentIndex];
   const upcoming = queueSongs.slice(currentIndex + 1);
-
   const shuffledUpcoming = shuffleArray(upcoming);
 
   queueSongs = [...played, current, ...shuffledUpcoming];
@@ -1573,7 +1592,6 @@ function shuffleQueue() {
 
   renderQueue();
 }
-
 function unshuffleQueue() {
 
   if (originalQueueOrder.length === 0) return;
@@ -1987,7 +2005,7 @@ const indexInQueue =
     song.album || "";
 
   document.querySelector(".albumArt").src =
-    song.artwork_path || "./icons/album.png";
+    song.artwork_path || "./b.jpg";
 
   document.querySelector('.likeButton .songIsFavorite').src =
     isSongFavorite(song)
@@ -2002,7 +2020,7 @@ const indexInQueue =
   // =========================
 
   const artworkPath =
-    song.artwork_path || "./icons/album.png";
+    song.artwork_path || "./b.jpg";
 
   if (
     artworkPath.startsWith("C:\\") ||
@@ -2557,9 +2575,9 @@ function playArtistSong(song) {
     s => s.id === song.id
   );
 
-  queueSongs = [...artistSongs];
-
-  queueIndex = clickedIndex;
+  const { queue, index } = buildQueueRespectingShuffle(songsForQueue, song);
+queueSongs = queue;
+queueIndex = index;
 
   renderQueue();
 
@@ -2574,9 +2592,9 @@ function playAllSongs(song) {
     s => s.id === song.id
   );
 
-  queueSongs = [...allSongs];
-
-  queueIndex = clickedIndex;
+const { queue, index } = buildQueueRespectingShuffle(songsForQueue, song);
+queueSongs = queue;
+queueIndex = index;
 
   renderQueue();
 
@@ -2621,9 +2639,9 @@ function playGenreSong(song, genreId) {
   }
 
   // Start queue at clicked song
-  queueSongs = [...genreSongs];
-
-  queueIndex = clickedIndex;
+  const { queue, index } = buildQueueRespectingShuffle(songsForQueue, song);
+queueSongs = queue;
+queueIndex = index;
 
   renderQueue();
 
@@ -3532,17 +3550,13 @@ function playAlbumContext(album) {
 
   if (!songs.length) return;
 
-  queueSongs = [
-    ...songs
-  ];
-
-  queueIndex = 0;
+  const { queue, index } = buildQueueRespectingShuffle(songs, songs[0]);
+queueSongs = queue;
+queueIndex = index;
 
   renderQueue();
 
-  playSong(
-    songs[0]
-  );
+  playSong(queue[index])
 }
 
 
@@ -3757,17 +3771,13 @@ function playArtistContext(artist) {
 
   if (!songs.length) return;
 
-  queueSongs = [
-    ...songs
-  ];
-
-  queueIndex = 0;
+ const { queue, index } = buildQueueRespectingShuffle(songs, songs[0]);
+queueSongs = queue;
+queueIndex = index;
 
   renderQueue();
 
-  playSong(
-    songs[0]
-  );
+ playSong(queue[index])
 }
 
 
@@ -3818,27 +3828,6 @@ function getArtistSongs(artist) {
         (b.track_number || 0)
       );
     });
-}
-
-
-function playArtistContext(artist) {
-
-  const songs =
-    getArtistSongs(artist);
-
-  if (!songs.length) return;
-
-  queueSongs = [
-    ...songs
-  ];
-
-  queueIndex = 0;
-
-  renderQueue();
-
-  playSong(
-    songs[0]
-  );
 }
 
 
@@ -3984,17 +3973,13 @@ function playPlaylistContext(playlist) {
 
   if (!songs.length) return;
 
-  queueSongs = [
-    ...songs
-  ];
-
-  queueIndex = 0;
+  const { queue, index } = buildQueueRespectingShuffle(songs, songs[0]);
+queueSongs = queue;
+queueIndex = index;
 
   renderQueue();
 
-  playSong(
-    songs[0]
-  );
+ playSong(queue[index]);
 }
 
 
@@ -5088,9 +5073,9 @@ if (clickedIndex === -1) {
 // CURRENT SONG + REMAINING
 // =========================
 
-queueSongs = [...songsForQueue]
-
-queueIndex = clickedIndex;
+const { queue, index } = buildQueueRespectingShuffle(songsForQueue, song);
+queueSongs = queue;
+queueIndex = index;
 
 
 console.log(
