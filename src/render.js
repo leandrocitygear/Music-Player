@@ -2797,7 +2797,7 @@ const volumeSlider =
   document.getElementById("volumeSlider");
 
 
-// Hide slider initially
+
 volumeSlider.style.display = "none";
 
 
