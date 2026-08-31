@@ -9,7 +9,7 @@ const {
 module.exports = {
   packagerConfig: {
     asar: true,
-
+    executableName: 'disc-out',
     icon: path.resolve(
     __dirname,
     'src/favicon_io/favicon'
