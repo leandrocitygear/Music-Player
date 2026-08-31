@@ -27,7 +27,7 @@ module.exports = {
       platforms: ['win32'],
        config: {
       getAdditionalConfig: () => ({
-        publish: null,
+        publish: 'never',
       }),
     },
     },
