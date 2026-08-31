@@ -40,11 +40,25 @@ jobs:
 
     - name: Build Windows MSIX
       run: npm run dist:win
+      env:
+        CSC_IDENTITY_AUTO_DISCOVERY: false
 
     - name: List build output
       if: always()
       shell: pwsh
-      run: Get-ChildItem out/msix -Recurse
+      run: |
+        Write-Host "Current directory:"
+        Get-Location
+
+        Write-Host "Files:"
+        Get-ChildItem -Recurse -Depth 3
+
+        Write-Host "Out directory:"
+        if (Test-Path out) {
+          Get-ChildItem out -Recurse
+        } else {
+          Write-Host "out directory does not exist"
+        }
 
     - name: Upload Windows MSIX
       uses: actions/upload-artifact@v5
