@@ -11,6 +11,14 @@ module.exports = {
   packagerConfig: {
     asar: true,
 
+  osxSign: false,
+
+  osxNotarize: false,
+
+  appBundleId: 'com.discout.app',
+
+  osxTarget: 'x64',
+
     executableName: 'disc-out',
 
     icon: path.resolve(
