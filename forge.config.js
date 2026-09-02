@@ -40,13 +40,8 @@ module.exports = {
       name: 'disc_out',
       authors: 'Leandro',
       exe: 'disc-out.exe',
-      // setupIcon: path.resolve(__dirname, 'favicon_io', 'favicon.ico'),
-      // iconUrl: path.resolve(__dirname, 'favicon_io', 'favicon.ico'),
       setupExe: 'Disc-OutSetup.exe',
       setupMsi: 'Disc-Out.msi',
-      certificateFile: process.env.CERTIFICATE_FILE,
-      certificatePassword: process.env.CERTIFICATE_PASSWORD,
-      signWithParams: '/f ' + process.env.CERTIFICATE_FILE + ' /p ' + process.env.CERTIFICATE_PASSWORD + ' /tr http://timestamp.comodoca.com /td sha256',
       remoteReleases: '',
       remoteToken: ''
     }
