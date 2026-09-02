@@ -41,7 +41,7 @@ module.exports = {
       authors: 'Leandro',
       exe: 'disc-out.exe',
       setupIcon: path.resolve(__dirname, 'favicon_io', 'favicon.ico'),
-      iconUrl: path.resolve(__dirname, 'favicon_io', 'favicon.ico'),
+      // iconUrl: path.resolve(__dirname, 'favicon_io', 'favicon.ico'),
       setupExe: 'Disc-OutSetup.exe',
       setupMsi: 'Disc-Out.msi',
       certificateFile: process.env.CERTIFICATE_FILE,
