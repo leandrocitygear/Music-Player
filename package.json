@@ -24,7 +24,7 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "@electron/rebuild": "^4.2.0",
-    "electron": "^41.2.0",
+    "electron": "^33.0.0",
     "electron-builder": "^27.0.0-alpha.7",
     "electronmon": "^2.0.4"
   },
