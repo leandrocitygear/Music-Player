@@ -20,6 +20,7 @@ module.exports = {
   osxTarget: 'x64',
 
     executableName: 'disc-out',
+    productName: 'Disc-Out',
 
     icon: path.resolve(
       __dirname,
@@ -37,13 +38,10 @@ module.exports = {
    {
     name: '@electron-forge/maker-squirrel',
     config: {
-      name: 'disc_out',
+      name: 'disc-out',
       authors: 'Leandro',
       exe: 'disc-out.exe',
-      setupExe: 'Disc-OutSetup.exe',
-      setupMsi: 'Disc-Out.msi',
-      remoteReleases: '',
-      remoteToken: ''
+      setupExe: 'Disc-OutSetup.exe'
     }
   }
     // macOS DMG
