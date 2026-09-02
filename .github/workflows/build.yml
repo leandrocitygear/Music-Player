@@ -28,10 +28,8 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Rebuild native modules for Electron
-      run: npx electron-rebuild -f -w better-sqlite3
-      env:
-        msvs_version: 2022
+    - name: Verify better-sqlite3
+      run: npm list better-sqlite3
 
     - name: Build Squirrel installer
       run: npm run make -- --platform=win32 --arch=x64
