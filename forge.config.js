@@ -34,28 +34,29 @@ module.exports = {
 
   makers: [
 
-    {
-  name: '@electron-forge/maker-zip',
-  platforms: ['win32'],
-  config: {}
-},
+   {
+    name: '@electron-forge/maker-squirrel',
+    config: {
+      name: 'disc_out'
+    }
+  }
     // macOS DMG
-    {
-      name: '@electron-forge/maker-dmg',
-      platforms: ['darwin'],
-    },
+    // {
+    //   name: '@electron-forge/maker-dmg',
+    //   platforms: ['darwin'],
+    // },
 
-    // Linux DEB
-    {
-      name: '@electron-forge/maker-deb',
-      platforms: ['linux'],
-    },
+    // // Linux DEB
+    // {
+    //   name: '@electron-forge/maker-deb',
+    //   platforms: ['linux'],
+    // },
 
-    // Linux RPM
-    {
-      name: '@electron-forge/maker-rpm',
-      platforms: ['linux'],
-    },
+    // // Linux RPM
+    // {
+    //   name: '@electron-forge/maker-rpm',
+    //   platforms: ['linux'],
+    // },
   ],
 
   plugins: [
