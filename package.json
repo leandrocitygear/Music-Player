@@ -11,7 +11,6 @@
     "publish": "electron-forge publish",
     "lint": "echo \"No linting configured\""
   },
-  
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",
     "@electron-forge/maker-deb": "^7.4.0",
@@ -24,8 +23,7 @@
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron/fuses": "^1.8.0",
     "@electron/rebuild": "^4.2.0",
-    "electron": "^33.0.0",
-    "electron-builder": "^27.0.0-alpha.7",
+    "electron": "^44.1.1",
     "electronmon": "^2.0.4"
   },
   "keywords": [],
@@ -41,8 +39,5 @@
     "jsmediatags": "^1.1.0",
     "music-metadata": "^11.15.0",
     "uuid": "^9.0.1"
-  },
-  "overrides": {
-    "@electron/node-gyp": "latest"
   }
 }

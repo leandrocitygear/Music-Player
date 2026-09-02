@@ -22,11 +22,7 @@ module.exports = {
     executableName: 'disc-out',
     productName: 'Disc-Out',
 
-    icon: path.resolve(
-      __dirname,
-      'favicon_io',
-      'favicon.ico'
-    ),
+    icon: path.resolve(__dirname, 'src', 'disc-out.ico')
   },
 
   rebuildConfig: {
@@ -40,27 +36,42 @@ module.exports = {
     config: {
       name: 'disc-out',
       authors: 'Leandro',
+      description: 'A desktop music player built with Electron',
       exe: 'disc-out.exe',
-      setupExe: 'Disc-OutSetup.exe'
+      setupExe: 'Disc-OutSetup.exe',
+      setupIcon: path.resolve(__dirname, 'src', 'disc-out.ico')
+    }
+  },
+    // macOS DMG
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {
+    icon: path.resolve(__dirname, 'src', 'disc-out.icns')
+  }
+    },
+
+    // Linux DEB
+    {
+      name: '@electron-forge/maker-deb',
+      platforms: ['linux'],
+     config: {
+    options: {
+      icon: path.resolve(__dirname, 'src', 'disc-out.png')
     }
   }
-    // macOS DMG
-    // {
-    //   name: '@electron-forge/maker-dmg',
-    //   platforms: ['darwin'],
-    // },
+    },
 
-    // // Linux DEB
-    // {
-    //   name: '@electron-forge/maker-deb',
-    //   platforms: ['linux'],
-    // },
-
-    // // Linux RPM
-    // {
-    //   name: '@electron-forge/maker-rpm',
-    //   platforms: ['linux'],
-    // },
+    // Linux RPM
+    {
+      name: '@electron-forge/maker-rpm',
+      platforms: ['linux'],
+      config: {
+    options: {
+      icon: path.resolve(__dirname, 'src', 'disc-out.png')
+    }
+  }
+    },
   ],
 
   plugins: [
