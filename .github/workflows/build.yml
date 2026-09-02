@@ -10,7 +10,7 @@ on:
 jobs:
   build-windows:
     name: Build Windows Squirrel Installer
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     steps:
     - name: Checkout
@@ -21,9 +21,6 @@ jobs:
       with:
         node-version: 21
         cache: npm
-
-    - name: Setup MSVC Build Tools
-      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Install dependencies
       run: npm install
